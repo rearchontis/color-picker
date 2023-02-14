@@ -1,7 +1,7 @@
 import { type Dispatch, type SetStateAction } from 'react';
 import styles from './ColorInputCMYK.module.css';
 
-function cmyk2rgb({ cyan, magenta, yellow, black }) {
+function cmyk2rgb({ cyan, magenta, yellow, black }: Record<string, number>) {
     const key = 1 - black / 100;
 
     return {
@@ -11,7 +11,7 @@ function cmyk2rgb({ cyan, magenta, yellow, black }) {
     }
 }
 
-function rgb2cmyk({ red, green, blue }) {
+function rgb2cmyk({ red, green, blue }: Record<string, number>) {
     const redCMYK = red / 255;
     const greenCMYK = green / 255;
     const blueCMYK = blue / 255;
@@ -50,7 +50,7 @@ export function ColorInputCMYK({ color, setColor }: IColorInputCMYKProps) {
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
 
-        setColor(cmyk2rgb({ cyan, magenta, yellow, black, [name]: value }))
+        setColor(cmyk2rgb({ cyan, magenta, yellow, black, [name]: +value }))
     }
 
     return (

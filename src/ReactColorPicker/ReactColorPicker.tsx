@@ -29,19 +29,13 @@ export function ReactColorPicker() {
         setColor(hsl2rgb({ hue, saturation: 100, lightness: 50 }));
     }
 
-    const onChangeColorInputHEX = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const hex = event.target.value;
-
-        setColor(hex2rgb(hex));
-    }
-
-    console.log("ReactColorPicker", color)
+    console.log("ReactColorPicker", color);
 
     return (
         <div className={styles.container}>
             <ColorPalette hue={hue} setColor={setColor} />
             <ColorSlider value={hue} onChange={onChangeColorSlider} />
-            <ColorInputHEX color={color} onChange={onChangeColorInputHEX} />
+            <ColorInputHEX color={color} setColor={setColor} />
             <ColorInputRGB color={color} />
             <ColorInputCMYK color={color} setColor={setColor} />
         </div>
