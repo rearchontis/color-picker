@@ -31,7 +31,7 @@ interface IColorInputHEXProps {
 }
 
 export function ColorInputHEX({ color, setColor }: IColorInputHEXProps) {
-    const [state, setState] = useState("");
+    const [state, setState] = useState(rgb2hex(color));
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const hex = event.target.value;
@@ -45,7 +45,7 @@ export function ColorInputHEX({ color, setColor }: IColorInputHEXProps) {
 
     return (
         <div className={styles.container}>
-            <input className={styles.input} type="text" value={state} onChange={onChange} value={rgb2hex(color)} />
+            <input className={styles.input} type="text" value={state} onChange={onChange} />
             <label>HEX</label>
         </div>
     );
