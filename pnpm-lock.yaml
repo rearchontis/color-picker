@@ -7,6 +7,8 @@ specifiers:
   '@types/react-dom': 18.0.10
   eslint: 8.34.0
   eslint-config-next: 13.1.6
+  lodash.debounce: ^4.0.8
+  lodash.throttle: ^4.1.1
   next: 13.1.6
   react: 18.2.0
   react-dom: 18.2.0
@@ -19,6 +21,8 @@ dependencies:
   '@types/react-dom': 18.0.10
   eslint: 8.34.0
   eslint-config-next: 13.1.6_7kw3g6rralp5ps6mg3uyzz6azm
+  lodash.debounce: 4.0.8
+  lodash.throttle: 4.1.1
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -1500,8 +1504,16 @@ packages:
       p-locate: 5.0.0
     dev: false
 
+  /lodash.debounce/4.0.8:
+    resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
+    dev: false
+
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+    dev: false
+
+  /lodash.throttle/4.1.1:
+    resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
     dev: false
 
   /loose-envify/1.4.0:
