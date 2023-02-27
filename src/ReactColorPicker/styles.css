@@ -1,0 +1,161 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+    margin: 20px;
+}
+
+.palette__container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+.palette__canvas {
+    width: 300px;
+    height: 300px;
+}
+
+.palette__marker {
+    box-sizing: border-box;
+    position: absolute;
+    border-radius: 50px;
+    /* top: -10px; */
+    /* left: 290px; */
+    border: 2px solid #fff;
+    margin: 0;
+    height: 20px;
+    width: 20px;
+    background: var(--current-color);
+}
+
+.slider__container {
+    width: 100%;
+    box-sizing: border-box;
+    height: 10px;
+    width: 360px;
+    position: relative;
+    pointer-events: none;
+}
+
+.slider__gradient {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    border-radius: 10px;
+    background: linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(0, 100%, 50%));
+    /* border: 1px solid #e5e5e5; */
+}
+
+.slider__control {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    -webkit-appearance: none;
+    background: transparent;
+    outline: none;
+    position: relative;
+    pointer-events: auto;
+    display: block;
+    border: none;
+}
+
+.slider__control:focus {
+    outline: none;
+}
+
+.slider__control::-ms-track {
+    width: 100%;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+
+.slider__control::-moz-focus-outer {
+    outline: none;
+    border: 0;
+}
+
+.slider__control::-moz-range-thumb {
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 4px -1px rgba(0,0,0,0.5);
+    border: 2px solid #fff;
+    margin: 0;
+    height: 15px;
+    width: 15px;
+    transform: scale(0.9);
+    transition: transform 0.18s ease;
+    background: transparent;
+}
+
+.slider__control::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border-radius: 50px;
+    background: var(--current-color);
+    cursor: pointer;
+    box-shadow: 0 0 4px -1px rgba(0,0,0,0.5);
+    height: 20px;
+    width: 20px;
+    margin: 0;
+    border: 2px solid #fff;
+    transform: scale(0.9);
+    transition: transform 0.18s ease;
+}
+
+.slider__control:focus::-moz-range-thumb {
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+    transform: scale(1);
+}
+
+.slider__control:focus::-webkit-slider-thumb {
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+    transform: scale(1);
+}
+
+.slider__background.slider__alpha {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-image: url("./alpha.svg");
+    background-size: auto;
+    background-repeat: repeat;
+    z-index: -1;
+}
+
+.slider__gradient.slider__alpha {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    border-radius: 5px;
+    background: linear-gradient(to left, var(--current-color), rgba(255,255,255,1));
+    z-index: -10;
+}
+
+.hex-input__control {
+    margin: 5px;
+}
+
+.rgb-input__container {}
+
+.rgb-input__control {
+    width: 50px;
+    margin: 5px;
+}
+
+.cmyk-input__container {}
+
+.cyan-input__control {
+    width: 50px;
+    margin: 5px;
+}

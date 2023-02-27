@@ -1,0 +1,23 @@
+.container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+.palette {
+    width: 300px;
+    height: 300px;
+}
+
+.marker {
+    position: absolute;
+    border-radius: 50px;
+    top: -10px;
+    left: 290px;
+    border: 2px solid #fff;
+    margin: 0;
+    height: 20px;
+    width: 20px;
+    background: transparent;
+    /* box-shadow: 0 0 5px #fff; */
+}
