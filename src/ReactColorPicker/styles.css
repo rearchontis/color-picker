@@ -4,7 +4,7 @@
     row-gap: 15px;
     margin: 20px;
     width: 240px;
-    user-select: none;
+    /* user-select: none; */
 }
 
 .palette__container {

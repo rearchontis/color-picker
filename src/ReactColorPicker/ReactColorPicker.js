@@ -87,8 +87,11 @@ export class ReactColorPicker extends React.PureComponent {
     componentDidMount() {
         let color, preview, rgb;
 
-        this.paletteCanvasRef.current.addEventListener('mouseup', this.onPalatteMouseUp);
-        this.paletteCanvasRef.current.addEventListener('mousemove', this.onPaletteMouseMove);
+        document.addEventListener('mouseup', this.onPalatteMouseUp);
+        document.addEventListener('mousemove', this.onPaletteMouseMove);
+
+        // this.paletteCanvasRef.current.addEventListener('mouseup', this.onPalatteMouseUp);
+        // this.paletteCanvasRef.current.addEventListener('mousemove', this.onPaletteMouseMove);
 
         this.canvasContext = this.paletteCanvasRef.current.getContext('2d', { willReadFrequently: true });
 
@@ -141,8 +144,8 @@ export class ReactColorPicker extends React.PureComponent {
      *
      */
     componentWillUnmount() {
-        this.paletteCanvasRef.current.removeEventListener('mouseup', this.onPalatteMouseUp);
-        this.paletteCanvasRef.current.removeEventListener('mousemove', this.onPaletteMouseMove);
+        document.removeEventListener('mouseup', this.onPalatteMouseUp);
+        document.removeEventListener('mousemove', this.onPaletteMouseMove);
     }
 
     /**
@@ -661,7 +664,11 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
      */
     onPaletteMouseMove = throttle((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (this.isPaletteMarkerDragged.current) {
+            console.log('event');
             this.onPaletteMarkerMove(event);
         }
     }, 10)
