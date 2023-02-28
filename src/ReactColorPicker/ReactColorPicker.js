@@ -152,27 +152,13 @@ export class ReactColorPicker extends React.PureComponent {
     componentDidUpdate() {
         const rgb = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
 
-        /**
-         * @descrition updates marker color on palette
-         */
-        {
-            this.paletteMarkerRef.current.style.setProperty('--current-color', rgb);
-        }
+        this.paletteMarkerRef.current.style.setProperty('--current-color', rgb);
 
-        /**
-         * @description updates rainbow slider preview color
-         */
         {
             const {red, green, blue} = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
 
             this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${red}, ${green}, ${blue}, 1)`);
         }
-
-        // const preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
-
-        // this.previewRef.current.style.setProperty('--current-color', preview);
-        // this.alphaChannelSliderRef.current.style.setProperty('--current-color', preview);
-        // this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', rgb);
 
         if (this.hasTransparency) {
             const preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
@@ -186,9 +172,6 @@ export class ReactColorPicker extends React.PureComponent {
             this.previewRef.current.style.setProperty('--current-color', preview);
         }
 
-        /**
-         * @description calls callback passed from parent component with updated state
-         */
         this.onChange(this.state);
     }
 
@@ -557,6 +540,10 @@ export class ReactColorPicker extends React.PureComponent {
         });
     }, 15)
 
+    /**
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} event
+     */
     onAlphaChannelInputChange = ({ target }) => {
         const numbers = /^[0-9]+$/;
         const maxValue = 100;
@@ -721,12 +708,10 @@ export class ReactColorPicker extends React.PureComponent {
     }
 
     /**
-     *
+     * @todo normalize classnames e.g. to className="react-color-picker__container"
      * @returns {JSX.Element}
      */
     render() {
-        // className="react-color-picker__container"
-        // console.log(this.state);
         return (
             <div className='container'>
                 <div className='palette__container'>
@@ -784,14 +769,9 @@ export class ReactColorPicker extends React.PureComponent {
 
                 <div className='input-group'>
                     <Input value={this.state.hex} name="hex" classes="hex" label="HEX" onChange={this.onHexInputChange} />
-
-                    {this.mode && (
-                        <>
-                            <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} />
-                            <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} />
-                            <Input value={this.state.blue} name="red" classes="rgb" label="B" onChange={this.onRgbInputChange} />
-                        </>
-                    )}
+                    <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} />
+                    <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} />
+                    <Input value={this.state.blue} name="red" classes="rgb" label="B" onChange={this.onRgbInputChange} />
                     {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
                 </div>
                 <div className='input-group'>
