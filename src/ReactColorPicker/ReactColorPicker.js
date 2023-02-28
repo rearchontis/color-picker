@@ -286,10 +286,10 @@ export class ReactColorPicker extends React.PureComponent {
         const yellow = (1 - blueCMYK - black) / key;
 
         return {
-            cyan: isNaN(cyan) ? 0 : Math.round(cyan * 100),
-            magenta: isNaN(magenta) ? 0 : Math.round(magenta * 100),
-            yellow: isNaN(yellow) ? 0 : Math.round(yellow * 100),
-            black: isNaN(black) ? 0 : Math.round(black * 100),
+            cyan: Math.round(cyan * 100) | 0,
+            magenta: Math.round(magenta * 100) | 0,
+            yellow: Math.round(yellow * 100) | 0,
+            black: Math.round(black * 100) | 0,
         };
     }
 
@@ -332,7 +332,7 @@ export class ReactColorPicker extends React.PureComponent {
     }
 
     /**
-     * 
+     *
      * @param {string} hex
      * @returns {{
      *      red: number,
@@ -477,10 +477,11 @@ export class ReactColorPicker extends React.PureComponent {
      */
     onColorSliderChange = throttle((event) => {
         const hue = parseInt(event.target.value);
-        const rgb = this.extractColorByPaletteMarkerPosition();
-        const cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
         this.updatePalette(hue);
+
+        const rgb = this.extractColorByPaletteMarkerPosition();
+        const cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
         this.setState({
             ...this.state,
@@ -495,6 +496,8 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
+        const regex = /[0-9][A-F]/i;
+
         const hex = target.value;
         if (hex.length === 7 || hex.length === 9) {
             const rgb = ReactColorPicker.hex2rgb(hex);
