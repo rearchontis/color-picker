@@ -179,7 +179,7 @@ export class ReactColorPicker extends React.PureComponent {
 
             this.previewRef.current.style.setProperty('--current-color', preview);
             this.alphaChannelSliderRef.current.style.setProperty('--current-color', preview);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', color);
+            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', rgb);
         } else {
             const preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`
 
@@ -785,23 +785,24 @@ export class ReactColorPicker extends React.PureComponent {
                 <div className='input-group'>
                     <Input value={this.state.hex} name="hex" classes="hex" label="HEX" onChange={this.onHexInputChange} />
 
-                    {this.mode === 'RGB'
-                        ?
-                            <>
-                                <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} />
-                                <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} />
-                                <Input value={this.state.blue} name="red" classes="rgb" label="B" onChange={this.onRgbInputChange} />
-                                {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
-                            </>
-                        :
-                            <>
-                                <Input value={this.state.cyan} name="cyan" classes="cmyk" label="C" onChange={this.onCmykInputChange} />
-                                <Input value={this.state.magenta} name="magenta" classes="cmyk" label="M" onChange={this.onCmykInputChange} />
-                                <Input value={this.state.yellow} name="yellow" classes="cmyk" label="Y" onChange={this.onCmykInputChange} />
-                                <Input value={this.state.black} name="black" classes="cmyk" label="K" onChange={this.onCmykInputChange} />
-                                {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
-                            </>
-                    }
+                    {this.mode && (
+                        <>
+                            <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} />
+                            <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} />
+                            <Input value={this.state.blue} name="red" classes="rgb" label="B" onChange={this.onRgbInputChange} />
+                        </>
+                    )}
+                    {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
+                </div>
+                <div className='input-group'>
+                    {this.mode === 'CMYK' && (
+                        <>
+                            <Input value={this.state.cyan} name="cyan" classes="cmyk" label="C" onChange={this.onCmykInputChange} />
+                            <Input value={this.state.magenta} name="magenta" classes="cmyk" label="M" onChange={this.onCmykInputChange} />
+                            <Input value={this.state.yellow} name="yellow" classes="cmyk" label="Y" onChange={this.onCmykInputChange} />
+                            <Input value={this.state.black} name="black" classes="cmyk" label="K" onChange={this.onCmykInputChange} />
+                        </>
+                    )}
                 </div>
             </div>
         )

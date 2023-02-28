@@ -151,20 +151,16 @@
     justify-content: space-between;
 }
 
-/* .input-group .uc-field-group:not(:last-child) {
-    margin-right: 7px;
-} */
-
 .input-group .hex {
     width: 70px;
 }
 
 .input-group .rgb {
-    width: 40px;
+    width: 35px;
 }
 
 .input-group .cmyk {
-    width: 40px;
+    width: 50px;
 }
 
 .hex-input__control {
