@@ -8,7 +8,7 @@ export default function Page() {
                 onChange={console.log}
                 initialValue={{red: 255, green: 0, blue: 0, alpha: 100}}
                 hasTransparency={true}
-                mode="RGB"
+                mode="CMYK"
             />
         </>
     );
