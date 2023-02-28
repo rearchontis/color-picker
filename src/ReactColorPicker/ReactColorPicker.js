@@ -489,34 +489,35 @@ export class ReactColorPicker extends React.PureComponent {
             ...cmyk,
             hue,
         });
-    }, 10)
+    }, 15)
 
     /**
      *
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
-        const regex = /[0-9][A-F]/i;
-
         const hex = target.value;
-        if (hex.length === 7 || hex.length === 9) {
-            const rgb = ReactColorPicker.hex2rgb(hex);
-            const hsv = ReactColorPicker.rgb2hsv(rgb);
-            const cmyk = ReactColorPicker.rgb2cmyk(rgb);
-            // console.log(rgb);
+        const validHexSymbolsRegExp = /#[0-9A-F]+/gi;
 
-            this.updatePalette(hsv.hue);
-            this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
+        if (hex.match(validHexSymbolsRegExp) && hex.length <= 9) {
+            if (hex.length === 4 || hex.length === 7 || hex.length === 9) {
+                const rgb = ReactColorPicker.hex2rgb(hex);
+                const hsv = ReactColorPicker.rgb2hsv(rgb);
+                const cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
-            this.setState({
-                ...this.state,
-                ...cmyk,
-                ...rgb,
-                ...hsv,
-                hex,
-            });
-        } else {
-            this.setState({ ...this.state, hex });
+                this.updatePalette(hsv.hue);
+                this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
+
+                this.setState({
+                    ...this.state,
+                    ...cmyk,
+                    ...rgb,
+                    ...hsv,
+                    hex,
+                });
+            } else {
+                this.setState({ ...this.state, hex });
+            }
         }
     }
 
