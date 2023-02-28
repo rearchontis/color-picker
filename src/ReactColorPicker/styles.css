@@ -3,19 +3,20 @@
     flex-direction: column;
     row-gap: 15px;
     margin: 20px;
-    width: 280px;
+    width: 240px;
     user-select: none;
 }
 
 .palette__container {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: 240px;
+    height: 240px;
 }
 
 .palette__canvas {
-    width: 280px;
-    height: 280px;
+    width: 240px;
+    height: 240px;
+    border-radius: 5px;
 }
 
 .palette__marker {
@@ -35,10 +36,9 @@
     width: 100%;
     box-sizing: border-box;
     height: 10px;
-    width: 230px;
+    width: 190px;
     position: relative;
     pointer-events: none;
-    margin: 5px;
 }
 
 .slider__gradient {
@@ -50,7 +50,6 @@
     pointer-events: none;
     border-radius: 10px;
     background: linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(0, 100%, 50%));
-    /* border: 1px solid #e5e5e5; */
 }
 
 .slider__control {
@@ -157,7 +156,7 @@
 } */
 
 .input-group .hex {
-    width: 80px;
+    width: 70px;
 }
 
 .input-group .rgb {
@@ -188,6 +187,7 @@
 
 .preview-area {
     display: flex;
+    justify-content: space-between;
 }
 
 .preview {
@@ -196,4 +196,11 @@
     height: 35px;
     border-radius: 5px;
     background: var(--current-color);
+}
+
+.preview-sliders {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
 }
