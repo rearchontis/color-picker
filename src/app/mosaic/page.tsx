@@ -6,9 +6,9 @@ export default function Page() {
         <>
             <ReactColorPicker
                 onChange={console.log}
-                initialValue={{cyan: 0, magenta: 100, yellow: 100, black: 0, alpha: 100}}
+                initialValue={{red: 255, green: 0, blue: 0, alpha: 100}}
                 hasTransparency={true}
-                mode="CMYK"
+                mode="RGB"
             />
         </>
     );

@@ -44,56 +44,24 @@ export class ReactColorPicker extends React.PureComponent {
         this.paletteCanvasRef = React.createRef();
         this.rainbowSliderRef = React.createRef();
 
+        this.isPaletteMarkerDragged = React.createRef(false);
+
+        let red = initialValue.red;
+        let green = initialValue.green;
+        let blue = initialValue.blue;
+        let {cyan, magenta, yellow, black} = ReactColorPicker.rgb2cmyk(initialValue);
+
+        let {hue, saturation, value} = ReactColorPicker.rgb2hsv({ red, green, blue });
+        let rgb = { red, green, blue };
+
         if (hasTransparency) {
+            rgb.alpha = initialValue.alpha;
+
             this.alphaChannelSliderRef = React.createRef();
             this.alphaChannelSliderGradientRef = React.createRef();
         }
 
-        this.isPaletteMarkerDragged = React.createRef(false);
-
-        let red;
-        let green;
-        let blue;
-
-        let cyan;
-        let magenta;
-        let yellow;
-        let black;
-
-        if (initialValue && mode === 'CMYK') {
-            const rgb = ReactColorPicker.cmyk2rgb(initialValue);
-
-            red = rgb.red;
-            green = rgb.green;
-            blue = rgb.blue;
-
-            cyan = initialValue.cyan;
-            magenta = initialValue.magenta;
-            yellow = initialValue.yellow;
-            black = initialValue.black;
-        }
-
-        if (initialValue && mode === 'RGB') {
-            const cmyk = ReactColorPicker.rgb2cmyk(initialValue);
-
-            red = initialValue.red;
-            green = initialValue.green;
-            blue = initialValue.blue;
-
-            cyan = cmyk.cyan;
-            magenta = cmyk.magenta;
-            yellow = cmyk.yellow;
-            black = cmyk.black;
-        }
-
-        const {hue, saturation, value} = ReactColorPicker.rgb2hsv({ red, green, blue });
-        const rgb = { red, green, blue };
-
-        if (hasTransparency) {
-            rgb.alpha = initialValue.alpha
-        }
-
-        const hex = ReactColorPicker.rgb2hex(rgb);
+        let hex = ReactColorPicker.rgb2hex(rgb);
 
         this.state = {
             hex,
@@ -117,58 +85,52 @@ export class ReactColorPicker extends React.PureComponent {
      *
      */
     componentDidMount() {
-        document.addEventListener('mouseup', this.onPalatteMouseUp);
-        document.addEventListener('mousemove', this.onPaletteMouseMove);
+        let color, preview, rgb;
+
+        this.paletteCanvasRef.current.addEventListener('mouseup', this.onPalatteMouseUp);
+        this.paletteCanvasRef.current.addEventListener('mousemove', this.onPaletteMouseMove);
 
         this.canvasContext = this.paletteCanvasRef.current.getContext('2d', { willReadFrequently: true });
 
         this.updatePalette(this.state.hue);
         this.updatePaletteMarkerPosition(this.state.saturation, this.state.value);
 
-        const color = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, 1)`;
+        rgb = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
+        this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 1)`);
 
+        color = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, 1)`;
         this.paletteMarkerRef.current.style.setProperty('--current-color', color);
 
-        {
-            const {red, green, blue} = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 })
-
-            this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${red}, ${green}, ${blue}, 1)`);
-        }
-
         if (this.hasTransparency) {
-            const preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
+            preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
 
             this.previewRef.current.style.setProperty('--current-color', preview);
             this.alphaChannelSliderRef.current.style.setProperty('--current-color', preview);
             this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', color);
         } else {
-            const preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`
-
+            preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
             this.previewRef.current.style.setProperty('--current-color', preview);
         }
 
     }
 
     componentDidUpdate() {
-        const rgb = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
+        let color, preview, rgb;
 
-        this.paletteMarkerRef.current.style.setProperty('--current-color', rgb);
+        rgb = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
+        this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 1)`);
 
-        {
-            const {red, green, blue} = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
-
-            this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${red}, ${green}, ${blue}, 1)`);
-        }
+        color = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
+        this.paletteMarkerRef.current.style.setProperty('--current-color', color);
 
         if (this.hasTransparency) {
-            const preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
+            preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
 
             this.previewRef.current.style.setProperty('--current-color', preview);
             this.alphaChannelSliderRef.current.style.setProperty('--current-color', preview);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', rgb);
+            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', color);
         } else {
-            const preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`
-
+            preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
             this.previewRef.current.style.setProperty('--current-color', preview);
         }
 
@@ -179,8 +141,8 @@ export class ReactColorPicker extends React.PureComponent {
      *
      */
     componentWillUnmount() {
-        document.removeEventListener('mouseup', this.onPalatteMouseUp);
-        document.removeEventListener('mousemove', this.onPaletteMouseMove);
+        this.paletteCanvasRef.current.removeEventListener('mouseup', this.onPalatteMouseUp);
+        this.paletteCanvasRef.current.removeEventListener('mousemove', this.onPaletteMouseMove);
     }
 
     /**
@@ -203,8 +165,8 @@ export class ReactColorPicker extends React.PureComponent {
             y -= 1;
         }
 
-        const {data} = this.canvasContext.getImageData(x, y, 1, 1);
-        const [red, green, blue] = data;
+        let {data} = this.canvasContext.getImageData(x, y, 1, 1);
+        let [red, green, blue] = data;
 
         return {red, green, blue};
     }
@@ -216,15 +178,15 @@ export class ReactColorPicker extends React.PureComponent {
     updatePalette = (hue) => {
         this.canvasContext.clearRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
 
-        const {red, green, blue} = ReactColorPicker.hsl2rgb({ hue, saturation: 100, lightness: 50 });
-        const gradientH = this.canvasContext.createLinearGradient(1, 1, this.canvasContext.canvas.width - 1, 1);
+        let {red, green, blue} = ReactColorPicker.hsl2rgb({ hue, saturation: 100, lightness: 50 });
+        let gradientH = this.canvasContext.createLinearGradient(1, 1, this.canvasContext.canvas.width - 1, 1);
         gradientH.addColorStop(0, 'rgba(255,255,255,1)');
         gradientH.addColorStop(1, `rgba(${red},${green},${blue},1)`);
 
         this.canvasContext.fillStyle = gradientH;
         this.canvasContext.fillRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
 
-        const gradientV = this.canvasContext.createLinearGradient(1, 1, 1, this.canvasContext.canvas.height - 1);
+        let gradientV = this.canvasContext.createLinearGradient(1, 1, 1, this.canvasContext.canvas.height - 1);
         gradientV.addColorStop(0, 'rgba(0,0,0,0)');
         gradientV.addColorStop(1, 'rgba(0,0,0,1)');
 
@@ -240,9 +202,12 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {number} value
      */
     updatePaletteMarkerPosition = (saturation, value) => {
-        const {height, width} = this.canvasContext.canvas;
-        const offsetLeft = ((Number(saturation) * width / 100) | 0) - 10;
-        const offsetTop = (height - (Number(value) * height / 100) | 0) - 10;
+        let height, width, offsetLeft, offsetTop;
+
+        height = this.canvasContext.canvas.height;
+        width = this.canvasContext.canvas.width;
+        offsetLeft = ((Number(saturation) * width / 100) | 0) - 10;
+        offsetTop = (height - (Number(value) * height / 100) | 0) - 10;
 
         this.paletteMarkerRef.current.style.top = `${offsetTop}px`;
         this.paletteMarkerRef.current.style.left = `${offsetLeft}px`;
@@ -263,7 +228,7 @@ export class ReactColorPicker extends React.PureComponent {
      * }} RGB in numbers from 0 to 255
      */
     static cmyk2rgb = ({ cyan, magenta, yellow, black }) => {
-        const key = 1 - black / 100;
+        let key = 1 - black / 100;
 
         return {
             red: Math.round((255 * (1 - cyan / 100) * key)),
@@ -287,16 +252,18 @@ export class ReactColorPicker extends React.PureComponent {
      * }} CMYK percents from 0 to 100
      */
     static rgb2cmyk = ({ red, green, blue }) => {
-        const redCMYK = red / 255;
-        const greenCMYK = green / 255;
-        const blueCMYK = blue / 255;
+        let normalizedRed, normalizedGreen, normalizedBlue, cyan, magenta, yellow, black, key;
 
-        const black = 1 - Math.max(redCMYK, greenCMYK, blueCMYK);
-        const key = 1 - black;
+        normalizedRed = red / 255;
+        normalizedGreen = green / 255;
+        normalizedBlue = blue / 255;
 
-        const cyan = (1 - redCMYK - black) / key;
-        const magenta = (1 - greenCMYK - black) / key;
-        const yellow = (1 - blueCMYK - black) / key;
+        black = 1 - Math.max(normalizedRed, normalizedGreen, normalizedBlue);
+        key = 1 - black;
+
+        cyan = (1 - normalizedRed - black) / key;
+        magenta = (1 - normalizedGreen - black) / key;
+        yellow = (1 - normalizedBlue - black) / key;
 
         return {
             cyan: Math.round(cyan * 100) | 0,
@@ -314,10 +281,10 @@ export class ReactColorPicker extends React.PureComponent {
      * @returns {{ red, green, blue }}
      */
     static hsl2rgb = ({ hue, saturation, lightness }) => {
-        const k = (n) => (n + hue / 30) % 12;
-        const a = saturation / 100 * Math.min(lightness / 100, 1 - lightness / 100);
+        let k = (n) => (n + hue / 30) % 12;
+        let a = saturation / 100 * Math.min(lightness / 100, 1 - lightness / 100);
 
-        const f = (n) => {
+        let f = (n) => {
             return lightness / 100 - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
         }
 
@@ -339,7 +306,7 @@ export class ReactColorPicker extends React.PureComponent {
      * @returns {string} hex
      */
     static rgb2hex = (rgba) => {
-        const pad = (n) => n.toString(16).padStart(2, '0');
+        let pad = (n) => n.toString(16).padStart(2, '0');
 
         return `#${Object.values(rgba).map(pad).join('')}`;
     }
@@ -355,8 +322,8 @@ export class ReactColorPicker extends React.PureComponent {
      * }}
      */
     static hex2rgb = (hex) => {
-        const halfHexFormatRegExp = /([0-9A-F])([0-9A-F])([0-9A-F])/i;
-        const longHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
+        let halfHexFormatRegExp = /([0-9A-F])([0-9A-F])([0-9A-F])/i;
+        let longHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
 
         if (longHexFormatRegExp.test(hex)) {
             if (hex[0] === '#') {
@@ -367,12 +334,12 @@ export class ReactColorPicker extends React.PureComponent {
                 hex = hex.replace(halfHexFormatRegExp, '$1$1$2$2$3$3');
             }
 
-            const rh = hex.slice(0, 2);
-            const gh = hex.slice(2, 4);
-            const bh = hex.slice(4, 6);
-            const ah = hex.slice(6, 8);
+            let rh = hex.slice(0, 2);
+            let gh = hex.slice(2, 4);
+            let bh = hex.slice(4, 6);
+            let ah = hex.slice(6, 8);
 
-            const result = {
+            let result = {
                 red: parseInt(rh, 16) | 0,
                 green: parseInt(gh, 16) | 0,
                 blue: parseInt(bh, 16) | 0,
@@ -389,12 +356,12 @@ export class ReactColorPicker extends React.PureComponent {
      * @returns {{ hue, saturation, value }} hsv
      */
     static rgb2hsv = ({ red, green, blue }) => {
-        const normalizedRed = red / 255;
-        const normalizedGreen = green / 255;
-        const normalizedBlue = blue / 255;
-        const normalizedMinValue = Math.min(normalizedRed, normalizedGreen, normalizedBlue);
-        const normalizedMaxValue = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
-        const normalizedDiff = normalizedMaxValue - normalizedMinValue;
+        let normalizedRed = red / 255;
+        let normalizedGreen = green / 255;
+        let normalizedBlue = blue / 255;
+        let normalizedMinValue = Math.min(normalizedRed, normalizedGreen, normalizedBlue);
+        let normalizedMaxValue = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
+        let normalizedDiff = normalizedMaxValue - normalizedMinValue;
 
         if (normalizedDiff === 0) {
             return {
@@ -404,10 +371,10 @@ export class ReactColorPicker extends React.PureComponent {
             };
         }
 
-        const normalizedSaturation = normalizedDiff / normalizedMaxValue;
-        const redHue = (normalizedMaxValue - normalizedRed) / 6 / normalizedDiff + 1 / 2;
-        const greenHue = (normalizedMaxValue - normalizedGreen) / 6 / normalizedDiff + 1 / 2;
-        const blueHue = (normalizedMaxValue - normalizedBlue) / 6 / normalizedDiff + 1 / 2;
+        let normalizedSaturation = normalizedDiff / normalizedMaxValue;
+        let redHue = (normalizedMaxValue - normalizedRed) / 6 / normalizedDiff + 1 / 2;
+        let greenHue = (normalizedMaxValue - normalizedGreen) / 6 / normalizedDiff + 1 / 2;
+        let blueHue = (normalizedMaxValue - normalizedBlue) / 6 / normalizedDiff + 1 / 2;
 
         let normalizedHue;
 
@@ -437,8 +404,8 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.MouseEvent<HTMLCanvasElement>} event
      */
     onPaletteMarkerMove = throttle((event) => {
-        const {left, top} = this.paletteCanvasRef.current.getBoundingClientRect();
-        const markerSize = 10;
+        let {left, top} = this.paletteCanvasRef.current.getBoundingClientRect();
+        let markerSize = 10;
 
         let markerPositionY = event.clientY - top - markerSize;
         let markerPositionX = event.clientX - left - markerSize;
@@ -462,36 +429,33 @@ export class ReactColorPicker extends React.PureComponent {
         this.paletteMarkerRef.current.style.top = `${markerPositionY}px`;
         this.paletteMarkerRef.current.style.left = `${markerPositionX}px`;
 
-        const {red, green, blue} = this.extractColorByPaletteMarkerPosition();
-        const {cyan, magenta, yellow, black} = ReactColorPicker.rgb2cmyk({ red, green, blue });
+        let rgb = this.extractColorByPaletteMarkerPosition();
+        let cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
         let hex = '';
 
         if (this.hasTransparency) {
-            hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha: this.state.alpha });
+            hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
         } else {
-            hex = ReactColorPicker.rgb2hex({ red, green, blue });
+            hex = ReactColorPicker.rgb2hex(rgb);
         }
 
-        const color =`rgba(${red}, ${green}, ${blue}, 1)`;
+        let color = `rgb(${rgb.red}, ${rgb.green}, ${rgb.blue})`;
 
         this.paletteMarkerRef.current.style.setProperty('--current-color', color);
 
         if (this.hasTransparency) {
+            let color = `rgb(${rgb.red}, ${rgb.green}, ${rgb.blue}, ${this.state.alpha})`;
+
             this.alphaChannelSliderRef.current.style.setProperty('--current-color', color);
             this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', color);
         }
 
         this.setState({
             ...this.state,
-            red,
-            green,
-            blue,
+            ...cmyk,
+            ...rgb,
             hex,
-            cyan,
-            magenta,
-            yellow,
-            black,
         });
     }, 10)
 
@@ -500,14 +464,13 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onColorSliderChange = throttle((event) => {
-        const hue = parseInt(event.target.value);
+        let hue, rgb, cmyk, hex;
 
+        hue = parseInt(event.target.value);
         this.updatePalette(hue);
 
-        const rgb = this.extractColorByPaletteMarkerPosition();
-        const cmyk = ReactColorPicker.rgb2cmyk(rgb);
-
-        let hex = '';
+        rgb = this.extractColorByPaletteMarkerPosition();
+        cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
         if (this.hasTransparency) {
             hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
@@ -529,9 +492,13 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onAlphaChannelSliderChange = throttle(({ target }) => {
-        const {red, green, blue} = this.state;
-        const alpha = Number(target.value);
-        const hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
+        let red, green, blue, alpha, hex;
+
+        red = this.state.red;
+        green = this.state.green;
+        blue = this.state.blue;
+        alpha = Number(target.value);
+        hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
 
         this.setState({
             ...this.state,
@@ -545,8 +512,8 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onAlphaChannelInputChange = ({ target }) => {
-        const numbers = /^[0-9]+$/;
-        const maxValue = 100;
+        let numbers = /^[0-9]+$/;
+        let maxValue = 100;
 
         if (target.value.match(numbers) || target.value === '') {
             let targetValue = Number(target.value);
@@ -564,14 +531,14 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
-        const hex = target.value;
-        const validHexSymbolsRegExp = /#[0-9A-F]+/gi;
+        let hex = target.value;
+        let validHexSymbolsRegExp = /#[0-9A-F]+/gi;
 
         if (hex.length <= 9 && hex.match(validHexSymbolsRegExp)) {
             if (hex.length === 4 || hex.length === 7 || hex.length === 9) {
-                const rgb = ReactColorPicker.hex2rgb(hex);
-                const hsv = ReactColorPicker.rgb2hsv(rgb);
-                const cmyk = ReactColorPicker.rgb2cmyk(rgb);
+                let rgb = ReactColorPicker.hex2rgb(hex);
+                let hsv = ReactColorPicker.rgb2hsv(rgb);
+                let cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
                 this.updatePalette(hsv.hue);
                 this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
@@ -594,8 +561,8 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onRgbInputChange = ({ target }) => {
-        const numbers = /^[0-9]+$/;
-        const maxValue = 255;
+        let numbers = /^[0-9]+$/;
+        let maxValue = 255;
 
         if (target.value.match(numbers) || target.value === '') {
             let targetValue = Number(target.value);
@@ -604,14 +571,14 @@ export class ReactColorPicker extends React.PureComponent {
                 targetValue = maxValue;
             }
 
-            const rgb = {
+            let rgb = {
                 red: this.state.red,
                 green: this.state.green,
                 blue: this.state.blue,
                 [target.name]: targetValue,
             };
-            const cmyk = ReactColorPicker.rgb2cmyk(rgb);
-            const hsv = ReactColorPicker.rgb2hsv(rgb);
+            let cmyk = ReactColorPicker.rgb2cmyk(rgb);
+            let hsv = ReactColorPicker.rgb2hsv(rgb);
 
             let hex = '';
 
@@ -640,8 +607,8 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onCmykInputChange = ({ target }) => {
-        const numbers = /^[0-9]+$/;
-        const maxValue = 100;
+        let numbers = /^[0-9]+$/;
+        let maxValue = 100;
 
         if (target.value.match(numbers) || target.value === '') {
             let targetValue = Number(target.value);
@@ -650,15 +617,15 @@ export class ReactColorPicker extends React.PureComponent {
                 targetValue = maxValue;
             }
 
-            const cmyk = {
+            let cmyk = {
                 cyan: this.state.cyan,
                 magenta: this.state.magenta,
                 yellow: this.state.yellow,
                 black: this.state.black,
                 [target.name]: targetValue,
             };
-            const rgb = ReactColorPicker.cmyk2rgb(cmyk);
-            const hsv = ReactColorPicker.rgb2hsv(rgb);
+            let rgb = ReactColorPicker.cmyk2rgb(cmyk);
+            let hsv = ReactColorPicker.rgb2hsv(rgb);
 
             let hex = '';
 
@@ -771,7 +738,7 @@ export class ReactColorPicker extends React.PureComponent {
                     <Input value={this.state.hex} name="hex" classes="hex" label="HEX" onChange={this.onHexInputChange} />
                     <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} />
                     <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} />
-                    <Input value={this.state.blue} name="red" classes="rgb" label="B" onChange={this.onRgbInputChange} />
+                    <Input value={this.state.blue} name="blue" classes="rgb" label="B" onChange={this.onRgbInputChange} />
                     {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
                 </div>
                 <div className='input-group'>
