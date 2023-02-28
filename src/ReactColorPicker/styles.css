@@ -10,7 +10,7 @@
 .palette__container {
     position: relative;
     width: 280px;
-    height: 300px;
+    height: 280px;
 }
 
 .palette__canvas {
@@ -35,9 +35,10 @@
     width: 100%;
     box-sizing: border-box;
     height: 10px;
-    width: 280px;
+    width: 230px;
     position: relative;
     pointer-events: none;
+    margin: 5px;
 }
 
 .slider__gradient {
@@ -183,4 +184,16 @@
 .cyan-input__control {
     width: 50px;
     margin: 5px;
+}
+
+.preview-area {
+    display: flex;
+}
+
+.preview {
+    border: 1px solid #ccc;
+    width: 35px;
+    height: 35px;
+    border-radius: 5px;
+    background: var(--current-color);
 }

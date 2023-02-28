@@ -39,6 +39,7 @@ export class ReactColorPicker extends React.PureComponent {
         this.hasTransparency = hasTransparency;
         this.mode = mode;
 
+        this.previewRef = React.createRef();
         this.paletteMarkerRef = React.createRef();
         this.paletteCanvasRef = React.createRef();
         this.rainbowSliderRef = React.createRef();
@@ -94,7 +95,7 @@ export class ReactColorPicker extends React.PureComponent {
             red,
             green,
             blue,
-            alpha: hasTransparency ? initialValue.alpha : 1,
+            alpha: hasTransparency ? initialValue.alpha : 100,
 
             cyan,
             magenta,
@@ -155,8 +156,8 @@ export class ReactColorPicker extends React.PureComponent {
             this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${red}, ${green}, ${blue}, 1)`);
         }
 
-        const preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha})`;
-
+        const preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
+        this.previewRef.current.style.setProperty('--current-color', preview);
         /**
          * @description calls callback passed from parent component with updated state
          */
@@ -496,6 +497,22 @@ export class ReactColorPicker extends React.PureComponent {
      *
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
+    onAlphaChannelSliderChange = throttle(({ target }) => {
+        const {red, green, blue} = this.state;
+        const alpha = Number(target.value);
+        const hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
+
+        this.setState({
+            ...this.state,
+            alpha,
+            hex,
+        });
+    }, 15)
+
+    /**
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} event
+     */
     onHexInputChange = ({ target }) => {
         const hex = target.value;
         const validHexSymbolsRegExp = /#[0-9A-F]+/gi;
@@ -654,32 +671,39 @@ export class ReactColorPicker extends React.PureComponent {
                         onMouseUp={this.onPalatteMouseUp}
                     />
                 </div>
-                <div className='slider__container'>
-                    <div className='slider__gradient' />
-                    <input
-                        ref={this.rainbowSliderRef}
-                        className='slider__control'
-                        type="range"
-                        value={this.state.hue}
-                        step={1}
-                        min="0"
-                        max="360"
-                        onChange={this.onColorSliderChange}
-                    />
+                <div className='preview-area'>
+                    <div className='preview' ref={this.previewRef} />
+                    <div className='preview-sliders'>
+                        <div className='slider__container'>
+                            <div className='slider__gradient' />
+                            <input
+                                ref={this.rainbowSliderRef}
+                                className='slider__control'
+                                type="range"
+                                value={this.state.hue}
+                                step={1}
+                                min="0"
+                                max="360"
+                                onChange={this.onColorSliderChange}
+                            />
+                        </div>
+                        <div className="slider__container">
+                            <div className="slider__background slider__alpha" />
+                            <div className="slider__gradient slider__alpha" ref={this.alphaChannelSliderGradientRef} />
+                            <input
+                                ref={this.alphaChannelSliderRef}
+                                className="slider__control"
+                                type="range"
+                                step={1}
+                                min="0"
+                                max="100"
+                                value={this.state.alpha}
+                                onChange={this.onAlphaChannelSliderChange}
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div className="slider__container">
-                    <div className="slider__background slider__alpha" />
-                    <div className="slider__gradient slider__alpha" ref={this.alphaChannelSliderGradientRef} />
-                    <input
-                        ref={this.alphaChannelSliderRef}
-                        className="slider__control"
-                        type="range"
-                        step={1}
-                        min="0"
-                        max="100"
-                        defaultValue="100"
-                    />
-                </div>
+
                 <div className='input-group'>
                     <Input value={this.state.hex} name="hex" classes="hex" label="HEX" onChange={this.onHexInputChange} />
                     {/* <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} /> */}
