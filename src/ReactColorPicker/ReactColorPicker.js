@@ -2,6 +2,7 @@
 import React from 'react';
 import throttle from 'lodash.throttle';
 import './styles.css';
+import {Input} from './Input/Input'
 
 /**
  * @param {function} props.onChange - callback which triggers on user input or 'ENTER' keyDown event when any control in in focus
@@ -499,7 +500,7 @@ export class ReactColorPicker extends React.PureComponent {
         const hex = target.value;
         const validHexSymbolsRegExp = /#[0-9A-F]+/gi;
 
-        if (hex.match(validHexSymbolsRegExp) && hex.length <= 9) {
+        if (hex.length <= 9 && hex.match(validHexSymbolsRegExp)) {
             if (hex.length === 4 || hex.length === 7 || hex.length === 9) {
                 const rgb = ReactColorPicker.hex2rgb(hex);
                 const hsv = ReactColorPicker.rgb2hsv(rgb);
@@ -637,8 +638,8 @@ export class ReactColorPicker extends React.PureComponent {
             <div className='container'>
                 <div className='palette__container'>
                     <canvas
-                        width="300"
-                        height="300"
+                        width="280"
+                        height="280"
                         ref={this.paletteCanvasRef}
                         className='palette__canvas'
                         onClick={this.onPaletteMarkerMove}
@@ -679,24 +680,17 @@ export class ReactColorPicker extends React.PureComponent {
                         defaultValue="100"
                     />
                 </div>
-                <div className="hex-input__container">
-                    <input
-                        className="hex-input__control"
-                        type="text"
-                        value={this.state.hex}
-                        onChange={this.onHexInputChange}
-                    />
-                    <label>HEX</label>
+                <div className='input-group'>
+                    <Input value={this.state.hex} name="hex" classes="hex" label="HEX" onChange={this.onHexInputChange} />
+                    {/* <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} /> */}
+                    {/* <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} /> */}
+                    {/* <Input value={this.state.blue} name="red" classes="rgb" label="B" onChange={this.onRgbInputChange} /> */}
+                    <Input value={this.state.cyan} name="cyan" classes="cmyk" label="C" onChange={this.onCmykInputChange} />
+                    <Input value={this.state.magenta} name="magenta" classes="cmyk" label="M" onChange={this.onCmykInputChange} />
+                    <Input value={this.state.yellow} name="yellow" classes="cmyk" label="Y" onChange={this.onCmykInputChange} />
+                    <Input value={this.state.black} name="black" classes="cmyk" label="K" onChange={this.onCmykInputChange} />
                 </div>
-                <div className="rgb-input__container">
-                    <input className="rgb-input__control" name="red" type="text" step={1} min={0} max={255} minLength={1} maxLength={3}  value={this.state.red} onChange={this.onRgbInputChange} />
-                    <label>R</label>
-                    <input className="rgb-input__control" name="green" type="text" step={1} min={0} max={255} minLength={1} maxLength={3}  value={this.state.green} onChange={this.onRgbInputChange} />
-                    <label>G</label>
-                    <input className="rgb-input__control" name="blue" type="text" step={1} min={0} max={255} minLength={1} maxLength={3} value={this.state.blue} onChange={this.onRgbInputChange} />
-                    <label>B</label>
-                </div>
-                <div className="cmyk-input__container">
+                {/* <div className="cmyk-input__container">
                     <input name='cyan' className="cyan-input__control" step={1} type="text" pattern="[0-9]" maxLength={3} value={this.state.cyan} onChange={this.onCmykInputChange} />
                     <label>C</label>
                     <input name='magenta' className="cyan-input__control" step={1} type="text" pattern="[0-9]" maxLength={3} value={this.state.magenta} onChange={this.onCmykInputChange} />
@@ -705,7 +699,7 @@ export class ReactColorPicker extends React.PureComponent {
                     <label>Y</label>
                     <input name='black' className="cyan-input__control" step={1} type="text" pattern="[0-9]" maxLength={3} value={this.state.black} onChange={this.onCmykInputChange} />
                     <label>K</label>
-                </div>
+                </div> */}
             </div>
         )
     }

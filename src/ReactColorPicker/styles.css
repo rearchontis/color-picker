@@ -3,17 +3,19 @@
     flex-direction: column;
     row-gap: 15px;
     margin: 20px;
+    width: 280px;
+    user-select: none;
 }
 
 .palette__container {
     position: relative;
-    width: 300px;
+    width: 280px;
     height: 300px;
 }
 
 .palette__canvas {
-    width: 300px;
-    height: 300px;
+    width: 280px;
+    height: 280px;
 }
 
 .palette__marker {
@@ -33,7 +35,7 @@
     width: 100%;
     box-sizing: border-box;
     height: 10px;
-    width: 360px;
+    width: 280px;
     position: relative;
     pointer-events: none;
 }
@@ -140,6 +142,29 @@
     border-radius: 5px;
     background: linear-gradient(to left, var(--current-color), rgba(255,255,255,1));
     z-index: -10;
+}
+
+.input-group {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* .input-group .uc-field-group:not(:last-child) {
+    margin-right: 7px;
+} */
+
+.input-group .hex {
+    width: 80px;
+}
+
+.input-group .rgb {
+    width: 40px;
+}
+
+.input-group .cmyk {
+    width: 40px;
 }
 
 .hex-input__control {
