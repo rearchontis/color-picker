@@ -43,6 +43,7 @@ export class ReactColorPicker extends React.PureComponent {
         this.paletteMarkerRef = React.createRef();
         this.paletteCanvasRef = React.createRef();
         this.rainbowSliderRef = React.createRef();
+        this.alphaChannelSliderMarkerRef = React.createRef();
 
         this.isPaletteMarkerDragged = React.createRef(false);
 
@@ -105,15 +106,28 @@ export class ReactColorPicker extends React.PureComponent {
         this.paletteMarkerRef.current.style.setProperty('--current-color', color);
 
         if (this.hasTransparency) {
+            let gradient = `linear-gradient(to right, rgba(0, 0, 0, 0), rgb(${this.state.red}, ${this.state.green}, ${this.state.blue}))`;
             preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
 
             this.previewRef.current.style.setProperty('--current-color', preview);
             this.alphaChannelSliderRef.current.style.setProperty('--current-color', preview);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', color);
+            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', preview);
+
+            const width = 190
+            const offsetLeft = ((this.state.alpha / 100 * width) | 0) - 10;
+
+            // const pointerStyle = {
+            //     left: `${offsetLeft}px`,
+            // };
+            // this.alphaChannelSliderMarkerRef.current.style.height = '10px'
+            // this.alphaChannelSliderMarkerRef.current.style.width = '10px'
+
+            // this.alphaChannelSliderMarkerRef.current.style.left = `${offsetLeft}px`
         } else {
             preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
             this.previewRef.current.style.setProperty('--current-color', preview);
         }
+
 
     }
 
@@ -429,8 +443,6 @@ export class ReactColorPicker extends React.PureComponent {
             markerPositionX = this.canvasContext.canvas.width - markerSize;
         }
 
-        // console.log({markerPositionX, markerPositionY})
-
         this.paletteMarkerRef.current.style.top = `${markerPositionY}px`;
         this.paletteMarkerRef.current.style.left = `${markerPositionX}px`;
 
@@ -443,17 +455,6 @@ export class ReactColorPicker extends React.PureComponent {
             hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
         } else {
             hex = ReactColorPicker.rgb2hex(rgb);
-        }
-
-        let color = `rgb(${rgb.red}, ${rgb.green}, ${rgb.blue})`;
-
-        this.paletteMarkerRef.current.style.setProperty('--current-color', color);
-
-        if (this.hasTransparency) {
-            let color = `rgb(${rgb.red}, ${rgb.green}, ${rgb.blue}, ${this.state.alpha})`;
-
-            this.alphaChannelSliderRef.current.style.setProperty('--current-color', color);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', color);
         }
 
         this.setState({
@@ -545,6 +546,15 @@ export class ReactColorPicker extends React.PureComponent {
 
             this.setState({ ...this.state, hex, alpha });
         }
+
+        // const width = 190
+        // const offsetLeft = ((alpha * width) | 0) - 6;
+
+        // const pointerStyle = {
+        //     left: `${offsetLeft}px`,
+        // };
+
+        // this.alphaChannelSliderMarker.current.style.left = `${offsetLeft}px`
     }
 
     /**
@@ -739,6 +749,17 @@ export class ReactColorPicker extends React.PureComponent {
                             />
                         </div>
                         {this.hasTransparency && (
+                            // <div
+                            //     // onMouseDown={onMouseDown}
+                            //     className="alpha"
+                            // >
+                            //     <div className="gradient" ref={this.alphaChannelSliderGradientRef} />
+                            //     <div className="alpha-area">
+                            //         <div className="alpha-mask">
+                            //             <div className="picker-pointer" ref={this.alphaChannelSliderMarkerRef} />
+                            //         </div>
+                            //     </div>
+                            // </div>
                             <div className="slider__container">
                                 <div className="slider__background slider__alpha" />
                                 <div className="slider__gradient slider__alpha" ref={this.alphaChannelSliderGradientRef} />
@@ -762,7 +783,7 @@ export class ReactColorPicker extends React.PureComponent {
                     <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} />
                     <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} />
                     <Input value={this.state.blue} name="blue" classes="rgb" label="B" onChange={this.onRgbInputChange} />
-                    {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
+                    {this.mode === 'RGB' && this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
                 </div>
                 <div className='input-group'>
                     {this.mode === 'CMYK' && (
@@ -771,6 +792,7 @@ export class ReactColorPicker extends React.PureComponent {
                             <Input value={this.state.magenta} name="magenta" classes="cmyk" label="M" onChange={this.onCmykInputChange} />
                             <Input value={this.state.yellow} name="yellow" classes="cmyk" label="Y" onChange={this.onCmykInputChange} />
                             <Input value={this.state.black} name="black" classes="cmyk" label="K" onChange={this.onCmykInputChange} />
+                            {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
                         </>
                     )}
                 </div>
