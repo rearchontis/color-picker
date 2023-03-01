@@ -503,7 +503,12 @@ export class ReactColorPicker extends React.PureComponent {
         green = this.state.green;
         blue = this.state.blue;
         alpha = Number(target.value);
-        hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
+
+        if (this.hasTransparency) {
+            hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
+        } else {
+            hex = ReactColorPicker.rgb2hex({ red, green, blue });
+        }
 
         this.setState({
             ...this.state,
@@ -517,17 +522,28 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onAlphaChannelInputChange = ({ target }) => {
-        let numbers = /^[0-9]+$/;
-        let maxValue = 100;
+        let red, green, blue, numbersRegExp, maxValue, alpha, hex;
 
-        if (target.value.match(numbers) || target.value === '') {
-            let targetValue = Number(target.value);
+        red = this.state.red;
+        green = this.state.green;
+        blue = this.state.blue;
+        numbersRegExp = /^[0-9]+$/;
+        maxValue = 100;
 
-            if (targetValue > maxValue) {
-                targetValue = maxValue;
+        if (target.value.match(numbersRegExp) || target.value === '') {
+            alpha = Number(target.value);
+
+            if (alpha > maxValue) {
+                alpha = maxValue;
             }
 
-            this.setState({ ...this.state, alpha: targetValue });
+            if (this.hasTransparency) {
+                hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
+            } else {
+                hex = ReactColorPicker.rgb2hex({ red, green, blue });
+            }
+
+            this.setState({ ...this.state, hex, alpha });
         }
     }
 
