@@ -1,19 +1,19 @@
 import './styles.css';
 
-export function Input({ value, label, name, onChange, classes }) {
+export function Input({ value, label, name, onChange, className }) {
     return (
-        <div className={`input-field ${classes}`}>
-            <div className="input-field input-container">
+        <div className={`react-color-picker__input-group input-field ${className}`}>
+            <div className="react-color-picker__input-group input-field input-container">
                 <input
-                    className="text-input"
+                    className="react-color-picker__input-group text-input"
                     value={value}
                     onChange={onChange}
                     name={name}
                     type="text"
-                    maxLength={3}
+                    maxLength={name !== 'hex' ? 3 : 9}
                 />
             </div>
-            <div className="input-field label">
+            <div className="react-color-picker__input-group input-field label">
                 {label}
             </div>
         </div>

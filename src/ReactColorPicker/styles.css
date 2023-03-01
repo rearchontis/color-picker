@@ -1,4 +1,4 @@
-.container {
+.react-color-picker__container {
     display: flex;
     flex-direction: column;
     row-gap: 15px;
@@ -7,24 +7,20 @@
     user-select: none;
 }
 
-.palette__container {
+.react-color-picker__palette {
     position: relative;
-    width: 240px;
-    height: 240px;
 }
 
-.palette__canvas {
+.react-color-picker__palette.palette__canvas {
     width: 240px;
     height: 240px;
     border-radius: 10px;
 }
 
-.palette__marker {
+.react-color-picker__palette.palette__marker {
     box-sizing: border-box;
     position: absolute;
     border-radius: 50px;
-    /* top: -10px; */
-    /* left: 290px; */
     border: 2px solid #fff;
     margin: 0;
     height: 20px;
@@ -32,7 +28,7 @@
     background: var(--current-color);
 }
 
-.slider__container {
+.react-color-picker__preview-area.slider__container {
     width: 100%;
     box-sizing: border-box;
     height: 10px;
@@ -42,7 +38,7 @@
     margin: 5px 0;
 }
 
-.slider__gradient {
+.react-color-picker__preview-area.slider__gradient {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -53,12 +49,31 @@
     background: linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(0, 100%, 50%));
 }
 
-.slider__control {
+.react-color-picker__preview-area.slider__gradient.slider__alpha {
+    background: linear-gradient(to left, var(--current-color), rgba(255,255,255,0));
+    z-index: -1;
+}
+
+.react-color-picker__preview-area.slider__background.slider__alpha {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-image: url("./alpha.svg");
+    background-size: auto;
+    background-repeat: repeat;
+    border-radius: 50px;
+    z-index: -10;
+}
+
+.react-color-picker__preview-area.slider__control {
+    -webkit-appearance: none;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
     margin: 0;
-    -webkit-appearance: none;
+    background: var(--current-color);
     background: transparent;
     outline: none;
     position: relative;
@@ -67,11 +82,11 @@
     border: none;
 }
 
-.slider__control:focus {
+.react-color-picker__preview-area.slider__control:focus {
     outline: none;
 }
 
-.slider__control::-ms-track {
+.react-color-picker__preview-area.slider__control::-ms-track {
     width: 100%;
     cursor: pointer;
     background: transparent;
@@ -79,12 +94,12 @@
     color: transparent;
 }
 
-.slider__control::-moz-focus-outer {
+.react-color-picker__preview-area.slider__control::-moz-focus-outer {
     outline: none;
     border: 0;
 }
 
-.slider__control::-moz-range-thumb {
+.react-color-picker__preview-area.slider__control::-moz-range-thumb {
     border-radius: 50px;
     cursor: pointer;
     background: var(--current-color);
@@ -93,12 +108,11 @@
     margin: 0;
     height: 15px;
     width: 15px;
-    transform: scale(0.9);
+    transform: scale(1);
     transition: transform 0.18s ease;
-    background: transparent;
 }
 
-.slider__control::-webkit-slider-thumb {
+.react-color-picker__preview-area.slider__control::-webkit-slider-thumb {
     -webkit-appearance: none;
     border-radius: 50px;
     background: var(--current-color);
@@ -112,85 +126,28 @@
     transition: transform 0.18s ease;
 }
 
-.slider__control:focus::-moz-range-thumb {
+.react-color-picker__preview-area.slider__control:focus::-moz-range-thumb {
     box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
     transform: scale(1.1);
 }
 
-.slider__control:focus::-webkit-slider-thumb {
+.react-color-picker__preview-area.slider__control:focus::-webkit-slider-thumb {
     box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
     transform: scale(1.1);
 }
 
-.slider__background.slider__alpha {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-image: url("./alpha.svg");
-    background-size: auto;
-    background-repeat: repeat;
-    border-radius: 50px;
-    z-index: -10;
-}
-
-.slider__gradient.slider__alpha {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    pointer-events: none;
-    border-radius: 5px;
-    background: linear-gradient(to left, var(--current-color), rgba(255,255,255,0));
-    z-index: -1;
-}
-
-.input-group {
-    /* width: 100%; */
+.react-color-picker__input-group {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
-
-.input-group .hex {
-    width: 80px;
-}
-
-.input-group .rgb {
-    width: 40px;
-}
-
-.input-group .cmyk {
-    width: 40px;
-}
-
-.hex-input__control {
-    margin: 5px;
-}
-
-.rgb-input__container {}
-
-.rgb-input__control {
-    width: 50px;
-    margin: 5px;
-}
-
-.cmyk-input__container {}
-
-.cyan-input__control {
-    width: 50px;
-    margin: 5px;
-}
-
-.preview-area {
+.react-color-picker__preview-area {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
 }
 
-.preview {
+.react-color-picker__preview-area.preview-box {
     border: 1px solid #bbbfc5;
     width: 35px;
     height: 35px;
@@ -198,56 +155,9 @@
     background: var(--current-color);
 }
 
-.preview-sliders {
+.react-color-picker__preview-area.preview-sliders {
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: space-around;
-}
-
-.alpha {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 10px;
-    height: 10px;
-    cursor: pointer;
-}
-
-.alpha .gradient {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--current-color);
-    /* background: `linear-gradient(to right, rgba(0, 0, 0, 0), rgb(${red}, ${green}, ${blue}))`, */
-}
-
-.alpha .alpha-area {
-    width: 100%;
-    height: 100%;
-    background: url("alpha.svg");
-    background-size: auto;
-    background-position: 50% 50%;
-    border-radius: 10px;
-    padding: 0 5px;
-}
-
-.alpha .alpha-area .alpha-mask {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    box-sizing: border-box;
-    position: absolute;
-    border-radius: 50px;
-    /* top: -10px; */
-    /* left: 290px; */
-    border: 2px solid #fff;
-    margin: 0;
-    height: 20px;
-    width: 20px;
-    top: -5px;
-    left: 180px;
-    background: var(--current-color);
 }

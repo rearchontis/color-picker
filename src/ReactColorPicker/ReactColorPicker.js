@@ -34,6 +34,8 @@ export class ReactColorPicker extends React.PureComponent {
     constructor({ onChange, initialValue, hasTransparency, mode }) {
         super();
 
+        let rgb, hsv, cmyk, hex;
+
         this.onChange = onChange;
         this.initialValue = initialValue;
         this.hasTransparency = hasTransparency;
@@ -44,16 +46,11 @@ export class ReactColorPicker extends React.PureComponent {
         this.paletteCanvasRef = React.createRef();
         this.rainbowSliderRef = React.createRef();
         this.alphaChannelSliderMarkerRef = React.createRef();
-
         this.isPaletteMarkerDragged = React.createRef(false);
 
-        let red = initialValue.red;
-        let green = initialValue.green;
-        let blue = initialValue.blue;
-        let {cyan, magenta, yellow, black} = ReactColorPicker.rgb2cmyk(initialValue);
-
-        let {hue, saturation, value} = ReactColorPicker.rgb2hsv({ red, green, blue });
-        let rgb = { red, green, blue };
+        rgb = { ...initialValue };
+        cmyk = ReactColorPicker.rgb2cmyk(rgb);
+        hsv = ReactColorPicker.rgb2hsv(rgb);
 
         if (hasTransparency) {
             rgb.alpha = initialValue.alpha;
@@ -62,23 +59,13 @@ export class ReactColorPicker extends React.PureComponent {
             this.alphaChannelSliderGradientRef = React.createRef();
         }
 
-        let hex = ReactColorPicker.rgb2hex(rgb);
+        hex = ReactColorPicker.rgb2hex(rgb);
 
         this.state = {
+            ...hsv,
+            ...rgb,
+            ...cmyk,
             hex,
-            hue,
-            saturation,
-            value,
-
-            red,
-            green,
-            blue,
-            alpha: hasTransparency ? initialValue.alpha : 100,
-
-            cyan,
-            magenta,
-            yellow,
-            black,
         }
     }
 
@@ -86,13 +73,10 @@ export class ReactColorPicker extends React.PureComponent {
      *
      */
     componentDidMount() {
-        let color, preview, rgb;
+        let CSSColor, CSSPreviewColor, rgb;
 
         document.addEventListener('mouseup', this.onPalatteMouseUp);
         document.addEventListener('mousemove', this.onPaletteMouseMove);
-
-        // this.paletteCanvasRef.current.addEventListener('mouseup', this.onPalatteMouseUp);
-        // this.paletteCanvasRef.current.addEventListener('mousemove', this.onPaletteMouseMove);
 
         this.canvasContext = this.paletteCanvasRef.current.getContext('2d', { willReadFrequently: true });
 
@@ -102,53 +86,41 @@ export class ReactColorPicker extends React.PureComponent {
         rgb = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
         this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 1)`);
 
-        color = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, 1)`;
-        this.paletteMarkerRef.current.style.setProperty('--current-color', color);
+        CSSColor = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, 1)`;
+        this.paletteMarkerRef.current.style.setProperty('--current-color', CSSColor);
 
         if (this.hasTransparency) {
-            let gradient = `linear-gradient(to right, rgba(0, 0, 0, 0), rgb(${this.state.red}, ${this.state.green}, ${this.state.blue}))`;
-            preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
+            CSSPreviewColor = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
 
-            this.previewRef.current.style.setProperty('--current-color', preview);
-            this.alphaChannelSliderRef.current.style.setProperty('--current-color', preview);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', preview);
-
-            const width = 190
-            const offsetLeft = ((this.state.alpha / 100 * width) | 0) - 10;
-
-            // const pointerStyle = {
-            //     left: `${offsetLeft}px`,
-            // };
-            // this.alphaChannelSliderMarkerRef.current.style.height = '10px'
-            // this.alphaChannelSliderMarkerRef.current.style.width = '10px'
-
-            // this.alphaChannelSliderMarkerRef.current.style.left = `${offsetLeft}px`
+            this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
+            this.alphaChannelSliderRef.current.style.setProperty('--current-color', CSSPreviewColor);
+            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSPreviewColor);
         } else {
-            preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
-            this.previewRef.current.style.setProperty('--current-color', preview);
+            CSSPreviewColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
+            this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
         }
 
 
     }
 
     componentDidUpdate() {
-        let color, preview, rgb;
+        let CSSColor, CSSPreviewColor, rgb;
 
         rgb = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
         this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 1)`);
 
-        color = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
-        this.paletteMarkerRef.current.style.setProperty('--current-color', color);
+        CSSColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
+        this.paletteMarkerRef.current.style.setProperty('--current-color', CSSColor);
 
         if (this.hasTransparency) {
-            preview = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
+            CSSPreviewColor = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
 
-            this.previewRef.current.style.setProperty('--current-color', preview);
-            this.alphaChannelSliderRef.current.style.setProperty('--current-color', preview);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', color);
+            this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
+            this.alphaChannelSliderRef.current.style.setProperty('--current-color', CSSPreviewColor);
+            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSPreviewColor);
         } else {
-            preview = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
-            this.previewRef.current.style.setProperty('--current-color', preview);
+            CSSPreviewColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
+            this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
         }
 
         this.onChange(this.state);
@@ -193,22 +165,28 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {number} hue
      */
     updatePalette = (hue) => {
-        this.canvasContext.clearRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+        let rgb, canvasWidth, canvasHeight, gradientH, gradientV;
 
-        let {red, green, blue} = ReactColorPicker.hsl2rgb({ hue, saturation: 100, lightness: 50 });
-        let gradientH = this.canvasContext.createLinearGradient(1, 1, this.canvasContext.canvas.width - 1, 1);
+        canvasWidth = this.canvasContext.canvas.width;
+        canvasHeight = this.canvasContext.canvas.height;
+
+        this.canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        rgb = ReactColorPicker.hsl2rgb({ hue, saturation: 100, lightness: 50 });
+
+        gradientH = this.canvasContext.createLinearGradient(1, 1, canvasWidth - 1, 1);
         gradientH.addColorStop(0, 'rgba(255,255,255,1)');
-        gradientH.addColorStop(1, `rgba(${red},${green},${blue},1)`);
+        gradientH.addColorStop(1, `rgba(${rgb.red},${rgb.green},${rgb.blue},1)`);
 
         this.canvasContext.fillStyle = gradientH;
-        this.canvasContext.fillRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height - 1);
+        this.canvasContext.fillRect(0, 0, canvasWidth, canvasHeight - 1);
 
-        let gradientV = this.canvasContext.createLinearGradient(1, 1, 1, this.canvasContext.canvas.height - 1);
+        gradientV = this.canvasContext.createLinearGradient(1, 1, 1, canvasHeight - 1);
         gradientV.addColorStop(0, 'rgba(0,0,0,0)');
         gradientV.addColorStop(1, 'rgba(0,0,0,1)');
 
         this.canvasContext.fillStyle = gradientV;
-        this.canvasContext.fillRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height - 1);
+        this.canvasContext.fillRect(0, 0, canvasWidth, canvasHeight - 1);
     }
 
     /**
@@ -336,6 +314,7 @@ export class ReactColorPicker extends React.PureComponent {
      *      green: number,
      *      blue: number,
      *      alpha?: number,
+     *      hex?: string,
      * }}
      */
     static hex2rgb = (hex) => {
@@ -356,14 +335,14 @@ export class ReactColorPicker extends React.PureComponent {
             let bh = hex.slice(4, 6);
             let ah = hex.slice(6, 8);
 
-            let result = {
+            let alpha = parseInt(ah, 16) | 0
+
+            return {
                 red: parseInt(rh, 16) | 0,
                 green: parseInt(gh, 16) | 0,
                 blue: parseInt(bh, 16) | 0,
-                alpha: parseInt(ah, 16) / 255 | 0,
+                alpha: alpha,
             };
-
-            return result;
         }
     }
 
@@ -373,12 +352,14 @@ export class ReactColorPicker extends React.PureComponent {
      * @returns {{ hue, saturation, value }} hsv
      */
     static rgb2hsv = ({ red, green, blue }) => {
-        let normalizedRed = red / 255;
-        let normalizedGreen = green / 255;
-        let normalizedBlue = blue / 255;
-        let normalizedMinValue = Math.min(normalizedRed, normalizedGreen, normalizedBlue);
-        let normalizedMaxValue = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
-        let normalizedDiff = normalizedMaxValue - normalizedMinValue;
+        let normalizedRed, normalizedGreen, normalizedBlue, normalizedMinValue, normalizedMaxValue, normalizedDiff;
+
+        normalizedRed = red / 255;
+        normalizedGreen = green / 255;
+        normalizedBlue = blue / 255;
+        normalizedMinValue = Math.min(normalizedRed, normalizedGreen, normalizedBlue);
+        normalizedMaxValue = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
+        normalizedDiff = normalizedMaxValue - normalizedMinValue;
 
         if (normalizedDiff === 0) {
             return {
@@ -388,12 +369,12 @@ export class ReactColorPicker extends React.PureComponent {
             };
         }
 
-        let normalizedSaturation = normalizedDiff / normalizedMaxValue;
-        let redHue = (normalizedMaxValue - normalizedRed) / 6 / normalizedDiff + 1 / 2;
-        let greenHue = (normalizedMaxValue - normalizedGreen) / 6 / normalizedDiff + 1 / 2;
-        let blueHue = (normalizedMaxValue - normalizedBlue) / 6 / normalizedDiff + 1 / 2;
+        let normalizedSaturation, redHue, greenHue, blueHue, normalizedHue;
 
-        let normalizedHue;
+        normalizedSaturation = normalizedDiff / normalizedMaxValue;
+        redHue = (normalizedMaxValue - normalizedRed) / 6 / normalizedDiff + 1 / 2;
+        greenHue = (normalizedMaxValue - normalizedGreen) / 6 / normalizedDiff + 1 / 2;
+        blueHue = (normalizedMaxValue - normalizedBlue) / 6 / normalizedDiff + 1 / 2;
 
         if (normalizedRed === normalizedMaxValue) {
             normalizedHue = blueHue - greenHue;
@@ -414,6 +395,35 @@ export class ReactColorPicker extends React.PureComponent {
             saturation: Math.round(normalizedSaturation * 100),
             value: Math.round(normalizedMaxValue * 100),
         };
+    }
+
+    /**
+     *
+     * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
+     */
+    onPaletteMouseDown = (event) => {
+        this.isPaletteMarkerDragged.current = true;
+    }
+
+    /**
+     *
+     * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
+     */
+    onPaletteMouseMove = throttle((event) => {
+        if (this.isPaletteMarkerDragged.current) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.onPaletteMarkerMove(event);
+        }
+    }, 10)
+
+    /**
+     *
+     * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
+     */
+    onPalatteMouseUp = (event) => {
+        this.isPaletteMarkerDragged.current = false;
     }
 
     /**
@@ -469,7 +479,7 @@ export class ReactColorPicker extends React.PureComponent {
      *
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
-    onColorSliderChange = throttle((event) => {
+    onColorSliderChange = (event) => {
         let hue, rgb, cmyk, hex;
 
         hue = parseInt(event.target.value);
@@ -491,13 +501,13 @@ export class ReactColorPicker extends React.PureComponent {
             hex,
             hue,
         });
-    }, 15)
+    }
 
     /**
      *
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
-    onAlphaChannelSliderChange = throttle(({ target }) => {
+    onAlphaChannelSliderChange = ({ target }) => {
         let red, green, blue, alpha, hex;
 
         red = this.state.red;
@@ -516,7 +526,7 @@ export class ReactColorPicker extends React.PureComponent {
             alpha,
             hex,
         });
-    }, 15)
+    }
 
     /**
      *
@@ -531,7 +541,7 @@ export class ReactColorPicker extends React.PureComponent {
         numbersRegExp = /^[0-9]+$/;
         maxValue = 100;
 
-        if (target.value.match(numbersRegExp) || target.value === '') {
+        if (numbersRegExp.test(target.value) || target.value === '') {
             alpha = Number(target.value);
 
             if (alpha > maxValue) {
@@ -546,15 +556,6 @@ export class ReactColorPicker extends React.PureComponent {
 
             this.setState({ ...this.state, hex, alpha });
         }
-
-        // const width = 190
-        // const offsetLeft = ((alpha * width) | 0) - 6;
-
-        // const pointerStyle = {
-        //     left: `${offsetLeft}px`,
-        // };
-
-        // this.alphaChannelSliderMarker.current.style.left = `${offsetLeft}px`
     }
 
     /**
@@ -562,10 +563,14 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
-        let hex = target.value;
-        let validHexSymbolsRegExp = /#[0-9A-F]+/gi;
+        let hexSymbolsRegExp = /#[0-9A-F]+/i;
+        let hex = target.value.match(hexSymbolsRegExp)[0];
 
-        if (hex.length <= 9 && hex.match(validHexSymbolsRegExp)) {
+        if (hex.length <= 9) {
+            if (hex.length === 9 && parseInt(hex.slice(7, 9), 16) > 100) {
+                hex = `#${hex.slice(0, 7)}64`;
+            }
+
             if (hex.length === 4 || hex.length === 7 || hex.length === 9) {
                 let rgb = ReactColorPicker.hex2rgb(hex);
                 let hsv = ReactColorPicker.rgb2hsv(rgb);
@@ -592,10 +597,10 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onRgbInputChange = ({ target }) => {
-        let numbers = /^[0-9]+$/;
+        let numbersRegExp = /^[0-9]+$/;
         let maxValue = 255;
 
-        if (target.value.match(numbers) || target.value === '') {
+        if (numbersRegExp.test(target.value) || target.value === '') {
             let targetValue = Number(target.value);
 
             if (targetValue > maxValue) {
@@ -611,7 +616,7 @@ export class ReactColorPicker extends React.PureComponent {
             let cmyk = ReactColorPicker.rgb2cmyk(rgb);
             let hsv = ReactColorPicker.rgb2hsv(rgb);
 
-            let hex = '';
+            let hex;
 
             if (this.hasTransparency) {
                 hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
@@ -638,10 +643,11 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onCmykInputChange = ({ target }) => {
-        let numbers = /^[0-9]+$/;
+        let numbersRegExp = /^[0-9]+$/;
+
         let maxValue = 100;
 
-        if (target.value.match(numbers) || target.value === '') {
+        if (numbersRegExp.test(target.value) || target.value === '') {
             let targetValue = Number(target.value);
 
             if (targetValue > maxValue) {
@@ -681,118 +687,107 @@ export class ReactColorPicker extends React.PureComponent {
 
     /**
      *
-     * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
-     */
-    onPaletteMouseDown = (event) => {
-        this.isPaletteMarkerDragged.current = true;
-    }
-
-    /**
-     *
-     * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
-     */
-    onPaletteMouseMove = throttle((event) => {
-        if (this.isPaletteMarkerDragged.current) {
-            event.preventDefault();
-            event.stopPropagation();
-            this.onPaletteMarkerMove(event);
-        }
-    }, 10)
-
-    /**
-     *
-     * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
-     */
-    onPalatteMouseUp = (event) => {
-        this.isPaletteMarkerDragged.current = false;
-    }
-
-    /**
-     * @todo normalize classnames e.g. to className="react-color-picker__container"
      * @returns {JSX.Element}
      */
     render() {
         return (
-            <div className='container'>
-                <div className='palette__container'>
+            <div className="react-color-picker__container">
+                <div className="react-color-picker__palette">
                     <canvas
                         width="240"
                         height="240"
                         ref={this.paletteCanvasRef}
-                        className='palette__canvas'
+                        className="react-color-picker__palette palette__canvas"
                         onClick={this.onPaletteMarkerMove}
                         onMouseUp={this.onPalatteMouseUp}
                         onMouseDown={this.onPaletteMouseDown}
                     />
                     <div
                         ref={this.paletteMarkerRef}
-                        className="palette__marker"
+                        className="react-color-picker__palette palette__marker"
                         onMouseDown={this.onPaletteMouseDown}
                         onMouseMove={this.onPaletteMouseMove}
                         onMouseUp={this.onPalatteMouseUp}
                     />
                 </div>
-                <div className='preview-area'>
-                    <div className='preview' ref={this.previewRef} />
-                    <div className='preview-sliders'>
-                        <div className='slider__container'>
-                            <div className='slider__gradient' />
+
+                <div className="react-color-picker__preview-area">
+                    <div
+                        className="react-color-picker__preview-area preview-box"
+                        ref={this.previewRef}
+                    />
+                    <div className="react-color-picker__preview-area preview-sliders">
+                        <div className="react-color-picker__preview-area slider__container">
+                            <div
+                                className="react-color-picker__preview-area slider__gradient"
+                            />
                             <input
+                                className=" react-color-picker__preview-area slider__control"
+                                onChange={this.onColorSliderChange}
                                 ref={this.rainbowSliderRef}
-                                className='slider__control'
-                                type="range"
                                 value={this.state.hue}
+                                type="range"
                                 step={1}
                                 min="0"
                                 max="360"
-                                onChange={this.onColorSliderChange}
                             />
                         </div>
                         {this.hasTransparency && (
-                            // <div
-                            //     // onMouseDown={onMouseDown}
-                            //     className="alpha"
-                            // >
-                            //     <div className="gradient" ref={this.alphaChannelSliderGradientRef} />
-                            //     <div className="alpha-area">
-                            //         <div className="alpha-mask">
-                            //             <div className="picker-pointer" ref={this.alphaChannelSliderMarkerRef} />
-                            //         </div>
-                            //     </div>
-                            // </div>
-                            <div className="slider__container">
-                                <div className="slider__background slider__alpha" />
-                                <div className="slider__gradient slider__alpha" ref={this.alphaChannelSliderGradientRef} />
+                            <div className="react-color-picker__preview-area slider__container">
+                                <div
+                                    className="react-color-picker__preview-area slider__gradient slider__alpha"
+                                    ref={this.alphaChannelSliderGradientRef}
+                                />
+                                <div
+                                    className="react-color-picker__preview-area slider__background slider__alpha"
+                                />
                                 <input
+                                    className="react-color-picker__preview-area slider__control"
+                                    onChange={this.onAlphaChannelSliderChange}
                                     ref={this.alphaChannelSliderRef}
-                                    className="slider__control"
+                                    value={this.state.alpha}
                                     type="range"
                                     step={1}
                                     min="0"
                                     max="100"
-                                    value={this.state.alpha}
-                                    onChange={this.onAlphaChannelSliderChange}
                                 />
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div className='input-group'>
-                    <Input value={this.state.hex} name="hex" classes="hex" label="HEX" onChange={this.onHexInputChange} />
-                    <Input value={this.state.red} name="red" classes="rgb" label="R" onChange={this.onRgbInputChange} />
-                    <Input value={this.state.green} name="green" classes="rgb" label="G" onChange={this.onRgbInputChange} />
-                    <Input value={this.state.blue} name="blue" classes="rgb" label="B" onChange={this.onRgbInputChange} />
-                    {this.mode === 'RGB' && this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
+                <div className="react-color-picker__input-group">
+                    <Input value={this.state.hex} name="hex" className="hex" label="HEX" onChange={this.onHexInputChange} />
+                    <Input value={this.state.red} name="red" className="rgb" label="R" onChange={this.onRgbInputChange} />
+                    <Input value={this.state.green} name="green" className="rgb" label="G" onChange={this.onRgbInputChange} />
+                    <Input value={this.state.blue} name="blue" className="rgb" label="B" onChange={this.onRgbInputChange} />
+                    {this.mode === 'RGB' && this.hasTransparency && (
+                        <Input
+                            value={this.state.alpha}
+                            name="alpha"
+                            className="alpha"
+                            label="Alpha"
+                            onChange={this.onAlphaChannelInputChange}
+                        />
+                    )}
                 </div>
-                <div className='input-group'>
+
+                <div className="react-color-picker__input-group">
                     {this.mode === 'CMYK' && (
                         <>
-                            <Input value={this.state.cyan} name="cyan" classes="cmyk" label="C" onChange={this.onCmykInputChange} />
-                            <Input value={this.state.magenta} name="magenta" classes="cmyk" label="M" onChange={this.onCmykInputChange} />
-                            <Input value={this.state.yellow} name="yellow" classes="cmyk" label="Y" onChange={this.onCmykInputChange} />
-                            <Input value={this.state.black} name="black" classes="cmyk" label="K" onChange={this.onCmykInputChange} />
-                            {this.hasTransparency && <Input value={this.state.alpha} name="alpha" classes="rgb" label="Alpha" onChange={this.onAlphaChannelInputChange} />}
+                            <Input value={this.state.cyan} name="cyan" className="cmyk" label="C" onChange={this.onCmykInputChange} />
+                            <Input value={this.state.magenta} name="magenta" className="cmyk" label="M" onChange={this.onCmykInputChange} />
+                            <Input value={this.state.yellow} name="yellow" className="cmyk" label="Y" onChange={this.onCmykInputChange} />
+                            <Input value={this.state.black} name="black" className="cmyk" label="K" onChange={this.onCmykInputChange} />
+                            {this.hasTransparency && (
+                                <Input
+                                    value={this.state.alpha}
+                                    name="alpha"
+                                    className="alpha"
+                                    label="Alpha"
+                                    onChange={this.onAlphaChannelInputChange}
+                                />
+                            )}
                         </>
                     )}
                 </div>

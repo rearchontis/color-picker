@@ -1,11 +1,11 @@
-.input-field {
+.react-color-picker__input-group.input-field {
     display: flex;
     flex-shrink: 0;
     align-items: center;
     flex-direction: column;
 }
 
-.input-field .label {
+.react-color-picker__input-group.input-field .label {
     font-size: 12px;
     line-height: 15px;
     font-weight: 600;
@@ -14,7 +14,7 @@
     color: #1F2667;
 }
 
-.input-field .input-container {
+.react-color-picker__input-group.input-field .input-container {
     display: flex;
     align-items: center;
     position: relative;
@@ -23,7 +23,7 @@
     color: #28314d;
 }
 
-.input-field .input-container .text-input {
+.react-color-picker__input-group.input-field .input-container .text-input {
     width: 100%;
     outline: 0;
     color: #1F2667;
@@ -34,4 +34,17 @@
     font-weight: 600;
     padding: 0 6px;
     text-align: center;
+}
+
+.react-color-picker__input-group.input-field.alpha,
+.react-color-picker__input-group.input-field.rgb {
+    width: 40px;
+}
+
+.react-color-picker__input-group.input-field.hex {
+    width: 90px;
+}
+
+.react-color-picker__input-group.input-field.cmyk {
+    width: 40px;
 }
