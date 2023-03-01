@@ -38,11 +38,11 @@
 
 .react-color-picker__input-group.input-field.alpha,
 .react-color-picker__input-group.input-field.rgb {
-    width: 40px;
+    width: 35px;
 }
 
 .react-color-picker__input-group.input-field.hex {
-    width: 90px;
+    width: 85px;
 }
 
 .react-color-picker__input-group.input-field.cmyk {

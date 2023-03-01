@@ -94,7 +94,7 @@ export class ReactColorPicker extends React.PureComponent {
 
             this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
             this.alphaChannelSliderRef.current.style.setProperty('--current-color', CSSPreviewColor);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSPreviewColor);
+            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSColor);
         } else {
             CSSPreviewColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
             this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
@@ -117,7 +117,7 @@ export class ReactColorPicker extends React.PureComponent {
 
             this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
             this.alphaChannelSliderRef.current.style.setProperty('--current-color', CSSPreviewColor);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSPreviewColor);
+            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSColor);
         } else {
             CSSPreviewColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
             this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
@@ -297,13 +297,22 @@ export class ReactColorPicker extends React.PureComponent {
      *      green: number,
      *      blue: number,
      *      alpha?: number,
-     * }} rgba
+     * }} rgb
      * @returns {string} hex
      */
-    static rgb2hex = (rgba) => {
+    static rgb2hex = (rgb) => {
         let pad = (n) => n.toString(16).padStart(2, '0');
 
-        return `#${Object.values(rgba).map(pad).join('')}`;
+        let hexRed = pad(rgb.red);
+        let hexGreen = pad(rgb.green);
+        let hexBlue = pad(rgb.blue);
+        let hexAlpha = rgb.alpha ? pad(rgb.alpha): ''
+
+        if (this.hasTransparency) {
+            return `#${hexRed}${hexGreen}${hexBlue}${hexAlpha}`
+        }
+
+        return `#${hexRed}${hexGreen}${hexBlue}`;
     }
 
     /**
@@ -690,6 +699,7 @@ export class ReactColorPicker extends React.PureComponent {
      * @returns {JSX.Element}
      */
     render() {
+        console.log(this.state.hex)
         return (
             <div className="react-color-picker__container">
                 <div className="react-color-picker__palette">
