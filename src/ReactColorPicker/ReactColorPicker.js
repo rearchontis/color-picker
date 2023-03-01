@@ -187,14 +187,14 @@ export class ReactColorPicker extends React.PureComponent {
         gradientH.addColorStop(1, `rgba(${red},${green},${blue},1)`);
 
         this.canvasContext.fillStyle = gradientH;
-        this.canvasContext.fillRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+        this.canvasContext.fillRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height - 1);
 
         let gradientV = this.canvasContext.createLinearGradient(1, 1, 1, this.canvasContext.canvas.height - 1);
         gradientV.addColorStop(0, 'rgba(0,0,0,0)');
         gradientV.addColorStop(1, 'rgba(0,0,0,1)');
 
         this.canvasContext.fillStyle = gradientV;
-        this.canvasContext.fillRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+        this.canvasContext.fillRect(0, 0, this.canvasContext.canvas.width, this.canvasContext.canvas.height - 1);
     }
 
     /**
@@ -428,6 +428,8 @@ export class ReactColorPicker extends React.PureComponent {
         if (markerPositionX > this.canvasContext.canvas.width - markerSize) {
             markerPositionX = this.canvasContext.canvas.width - markerSize;
         }
+
+        // console.log({markerPositionX, markerPositionY})
 
         this.paletteMarkerRef.current.style.top = `${markerPositionY}px`;
         this.paletteMarkerRef.current.style.left = `${markerPositionX}px`;
@@ -664,11 +666,9 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.MouseEvent<HTMLDivElement, MouseEvent>} event
      */
     onPaletteMouseMove = throttle((event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
         if (this.isPaletteMarkerDragged.current) {
-            console.log('event');
+            event.preventDefault();
+            event.stopPropagation();
             this.onPaletteMarkerMove(event);
         }
     }, 10)

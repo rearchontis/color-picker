@@ -4,7 +4,7 @@
     row-gap: 15px;
     margin: 20px;
     width: 240px;
-    /* user-select: none; */
+    user-select: none;
 }
 
 .palette__container {
@@ -16,7 +16,7 @@
 .palette__canvas {
     width: 240px;
     height: 240px;
-    border-radius: 5px;
+    /* border-radius: 5px; */
 }
 
 .palette__marker {
