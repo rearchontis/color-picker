@@ -299,10 +299,14 @@ export class ReactColorPicker extends React.PureComponent {
      * }} rgb
      * @returns {string} hex
      */
-    static rgb2hex = ({ red, green, blue }) => {
+    static rgb2hex = (rgb) => {
         let pad = (n) => n.toString(16).padStart(2, '0');
 
-        return `#${pad(red)}${pad(green)}${pad(blue)}`;
+        if (rgb.alpha) {
+            return  `#${pad(rgb.red)}${pad(rgb.green)}${pad(rgb.blue)}${pad(rgb.alpha)}`
+        }
+
+        return `#${pad(rgb.red)}${pad(rgb.green)}${pad(rgb.blue)}`;
     }
 
     /**
@@ -313,7 +317,6 @@ export class ReactColorPicker extends React.PureComponent {
      *      green: number,
      *      blue: number,
      *      alpha?: number,
-     *      hex?: string,
      * }}
      */
     static hex2rgb = (hex) => {
@@ -332,11 +335,13 @@ export class ReactColorPicker extends React.PureComponent {
             let rhex = hex.slice(0, 2);
             let ghex = hex.slice(2, 4);
             let bhex = hex.slice(4, 6);
+            let ahex = hex.slice(6, 8);
 
             return {
                 red: parseInt(rhex, 16) | 0,
                 green: parseInt(ghex, 16) | 0,
                 blue: parseInt(bhex, 16) | 0,
+                alpha: parseInt(ahex, 16) | 0,
             };
         }
     }
@@ -511,10 +516,12 @@ export class ReactColorPicker extends React.PureComponent {
         alpha = Number(target.value);
 
         if (this.hasTransparency) {
-            hex = ReactColorPicker.rgb2hex({ red, green, blue });
+            hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
         } else {
             hex = ReactColorPicker.rgb2hex({ red, green, blue });
         }
+
+        console.log(hex);
 
         this.setState({
             ...this.state,
@@ -544,7 +551,7 @@ export class ReactColorPicker extends React.PureComponent {
             }
 
             if (this.hasTransparency) {
-                hex = ReactColorPicker.rgb2hex({ red, green, blue });
+                hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
             } else {
                 hex = ReactColorPicker.rgb2hex({ red, green, blue });
             }
@@ -558,10 +565,26 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
-        let longHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
-        let hex = target.value;
+        let hex, halfHexFormatRegExp, fullHexFormatRegExp, hexAlpha, transparencyValue, transparencyLimitInHex, transparencyLimitInDecimal;
 
-        if (longHexFormatRegExp.test(hex)) {
+        hex = target.value;
+        halfHexFormatRegExp = /([0-9A-F])([0-9A-F])([0-9A-F])/i;
+        fullHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
+
+        if (fullHexFormatRegExp.test(hex)) {
+            if (hex.length === 4) {
+                hexAlpha = this.state.alpha.toString(16).padStart(2, '0');
+                hex = hex.replace(halfHexFormatRegExp, '$1$1$2$2$3$3') + hexAlpha;
+            }
+
+            transparencyValue = parseInt(hex.slice(7, 9), 16);
+            transparencyLimitInHex = '64';
+            transparencyLimitInDecimal = 100;
+
+            if (hex.length === 9 && transparencyValue > transparencyLimitInDecimal) {
+                hex = `#${hex.slice(1, 7)}${transparencyLimitInHex}`;
+            }
+
             let rgb = ReactColorPicker.hex2rgb(hex);
             let hsv = ReactColorPicker.rgb2hsv(rgb);
             let cmyk = ReactColorPicker.rgb2cmyk(rgb);
@@ -579,34 +602,6 @@ export class ReactColorPicker extends React.PureComponent {
         } else {
             this.setState({ ...this.state, hex: target.value })
         }
-
-
-        // if (hexMatch && hexMatch[0].length <= 9) {
-        //     let hex = hexMatch[0];
-
-        //     if (isHex && hex.length === 9 && parseInt(hex.slice(7, 9), 16) > 100) {
-        //         hex = `#${hex.slice(0, 7)}64`;
-        //     }
-
-        //     if (isHex && hex.length === 4 || hex.length === 7 || hex.length === 9) {
-        //         let rgb = ReactColorPicker.hex2rgb(hex);
-        //         let hsv = ReactColorPicker.rgb2hsv(rgb);
-        //         let cmyk = ReactColorPicker.rgb2cmyk(rgb);
-
-        //         this.updatePalette(hsv.hue);
-        //         this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
-
-        //         this.setState({
-        //             ...this.state,
-        //             ...cmyk,
-        //             ...rgb,
-        //             ...hsv,
-        //             hex,
-        //         });
-        //     } else {
-        //         this.setState({ ...this.state, hex });
-        //     }
-        // }
     }
 
     /**
@@ -707,7 +702,7 @@ export class ReactColorPicker extends React.PureComponent {
      * @returns {JSX.Element}
      */
     render() {
-        console.log(this.state.hex)
+        // console.log(this.state.hex)
         return (
             <div className="react-color-picker__container">
                 <div className="react-color-picker__palette">
