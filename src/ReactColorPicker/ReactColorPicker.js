@@ -521,8 +521,6 @@ export class ReactColorPicker extends React.PureComponent {
             hex = ReactColorPicker.rgb2hex({ red, green, blue });
         }
 
-        console.log(hex);
-
         this.setState({
             ...this.state,
             alpha,
@@ -702,7 +700,6 @@ export class ReactColorPicker extends React.PureComponent {
      * @returns {JSX.Element}
      */
     render() {
-        // console.log(this.state.hex)
         return (
             <div className="react-color-picker__container">
                 <div className="react-color-picker__palette">
