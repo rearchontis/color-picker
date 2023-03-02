@@ -10,7 +10,7 @@ export function Input({ value, label, name, onChange, className }) {
                     onChange={onChange}
                     name={name}
                     type="text"
-                    maxLength={name !== 'hex' ? 3 : 9}
+                    maxLength={name === 'hex' ? 9 : 3}
                 />
             </div>
             <div className="react-color-picker__input-group input-field label">

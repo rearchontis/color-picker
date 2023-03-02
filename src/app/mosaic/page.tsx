@@ -7,7 +7,7 @@ export default function Page() {
             <ReactColorPicker
                 onChange={() => {}}
                 initialValue={{red: 255, green: 0, blue: 0, alpha: 75}}
-                hasTransparency={false}
+                hasTransparency={true}
                 mode="CMYK"
             />
         </>

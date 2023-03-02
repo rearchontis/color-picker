@@ -53,7 +53,7 @@ export class ReactColorPicker extends React.PureComponent {
         hsv = ReactColorPicker.rgb2hsv(rgb);
 
         if (hasTransparency) {
-            rgb.alpha = initialValue.alpha;
+            rgb.alpha = initialValue.alpha && 100;
 
             this.alphaChannelSliderRef = React.createRef();
             this.alphaChannelSliderGradientRef = React.createRef();
@@ -296,23 +296,13 @@ export class ReactColorPicker extends React.PureComponent {
      *      red: number,
      *      green: number,
      *      blue: number,
-     *      alpha?: number,
      * }} rgb
      * @returns {string} hex
      */
-    static rgb2hex = (rgb) => {
+    static rgb2hex = ({ red, green, blue }) => {
         let pad = (n) => n.toString(16).padStart(2, '0');
 
-        let hexRed = pad(rgb.red);
-        let hexGreen = pad(rgb.green);
-        let hexBlue = pad(rgb.blue);
-        let hexAlpha = rgb.alpha ? pad(rgb.alpha): ''
-
-        if (this.hasTransparency) {
-            return `#${hexRed}${hexGreen}${hexBlue}${hexAlpha}`
-        }
-
-        return `#${hexRed}${hexGreen}${hexBlue}`;
+        return `#${pad(red)}${pad(green)}${pad(blue)}`;
     }
 
     /**
@@ -339,18 +329,14 @@ export class ReactColorPicker extends React.PureComponent {
                 hex = hex.replace(halfHexFormatRegExp, '$1$1$2$2$3$3');
             }
 
-            let rh = hex.slice(0, 2);
-            let gh = hex.slice(2, 4);
-            let bh = hex.slice(4, 6);
-            let ah = hex.slice(6, 8);
-
-            let alpha = parseInt(ah, 16) | 0
+            let rhex = hex.slice(0, 2);
+            let ghex = hex.slice(2, 4);
+            let bhex = hex.slice(4, 6);
 
             return {
-                red: parseInt(rh, 16) | 0,
-                green: parseInt(gh, 16) | 0,
-                blue: parseInt(bh, 16) | 0,
-                alpha: alpha,
+                red: parseInt(rhex, 16) | 0,
+                green: parseInt(ghex, 16) | 0,
+                blue: parseInt(bhex, 16) | 0,
             };
         }
     }
@@ -471,7 +457,7 @@ export class ReactColorPicker extends React.PureComponent {
         let hex = '';
 
         if (this.hasTransparency) {
-            hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
+            hex = ReactColorPicker.rgb2hex(rgb);
         } else {
             hex = ReactColorPicker.rgb2hex(rgb);
         }
@@ -498,7 +484,7 @@ export class ReactColorPicker extends React.PureComponent {
         cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
         if (this.hasTransparency) {
-            hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
+            hex = ReactColorPicker.rgb2hex(rgb);
         } else {
             hex = ReactColorPicker.rgb2hex(rgb);
         }
@@ -525,7 +511,7 @@ export class ReactColorPicker extends React.PureComponent {
         alpha = Number(target.value);
 
         if (this.hasTransparency) {
-            hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
+            hex = ReactColorPicker.rgb2hex({ red, green, blue });
         } else {
             hex = ReactColorPicker.rgb2hex({ red, green, blue });
         }
@@ -558,7 +544,7 @@ export class ReactColorPicker extends React.PureComponent {
             }
 
             if (this.hasTransparency) {
-                hex = ReactColorPicker.rgb2hex({ red, green, blue, alpha });
+                hex = ReactColorPicker.rgb2hex({ red, green, blue });
             } else {
                 hex = ReactColorPicker.rgb2hex({ red, green, blue });
             }
@@ -572,33 +558,55 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
-        let hexSymbolsRegExp = /#[0-9A-F]+/i;
-        let hex = target.value.match(hexSymbolsRegExp)[0];
+        let longHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
+        let hex = target.value;
 
-        if (hex.length <= 9) {
-            if (hex.length === 9 && parseInt(hex.slice(7, 9), 16) > 100) {
-                hex = `#${hex.slice(0, 7)}64`;
-            }
+        if (longHexFormatRegExp.test(hex)) {
+            let rgb = ReactColorPicker.hex2rgb(hex);
+            let hsv = ReactColorPicker.rgb2hsv(rgb);
+            let cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
-            if (hex.length === 4 || hex.length === 7 || hex.length === 9) {
-                let rgb = ReactColorPicker.hex2rgb(hex);
-                let hsv = ReactColorPicker.rgb2hsv(rgb);
-                let cmyk = ReactColorPicker.rgb2cmyk(rgb);
+            this.updatePalette(hsv.hue);
+            this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
 
-                this.updatePalette(hsv.hue);
-                this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
-
-                this.setState({
-                    ...this.state,
-                    ...cmyk,
-                    ...rgb,
-                    ...hsv,
-                    hex,
-                });
-            } else {
-                this.setState({ ...this.state, hex });
-            }
+            this.setState({
+                ...this.state,
+                ...cmyk,
+                ...rgb,
+                ...hsv,
+                hex,
+            });
+        } else {
+            this.setState({ ...this.state, hex: target.value })
         }
+
+
+        // if (hexMatch && hexMatch[0].length <= 9) {
+        //     let hex = hexMatch[0];
+
+        //     if (isHex && hex.length === 9 && parseInt(hex.slice(7, 9), 16) > 100) {
+        //         hex = `#${hex.slice(0, 7)}64`;
+        //     }
+
+        //     if (isHex && hex.length === 4 || hex.length === 7 || hex.length === 9) {
+        //         let rgb = ReactColorPicker.hex2rgb(hex);
+        //         let hsv = ReactColorPicker.rgb2hsv(rgb);
+        //         let cmyk = ReactColorPicker.rgb2cmyk(rgb);
+
+        //         this.updatePalette(hsv.hue);
+        //         this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
+
+        //         this.setState({
+        //             ...this.state,
+        //             ...cmyk,
+        //             ...rgb,
+        //             ...hsv,
+        //             hex,
+        //         });
+        //     } else {
+        //         this.setState({ ...this.state, hex });
+        //     }
+        // }
     }
 
     /**
@@ -628,7 +636,7 @@ export class ReactColorPicker extends React.PureComponent {
             let hex;
 
             if (this.hasTransparency) {
-                hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
+                hex = ReactColorPicker.rgb2hex(rgb);
             } else {
                 hex = ReactColorPicker.rgb2hex(rgb);
             }
@@ -676,7 +684,7 @@ export class ReactColorPicker extends React.PureComponent {
             let hex = '';
 
             if (this.hasTransparency) {
-                hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
+                hex = ReactColorPicker.rgb2hex(rgb);
             } else {
                 hex = ReactColorPicker.rgb2hex(rgb);
             }
