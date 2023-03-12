@@ -137,6 +137,10 @@ export class ReactColorPicker extends React.Component {
         document.removeEventListener('mousemove', this.onPaletteMouseMove);
     }
 
+    /**
+     *
+     * @returns {boolean} false if any of red, green or blue values are invalid
+     */
     isRGBStateValid = () => {
         let red, green, blue, numbersRegExp, maxRGBValue;
 
