@@ -5,7 +5,8 @@ import './styles.css';
 import {Input} from './Input/Input'
 
 /**
- * @param {function} props.onChange - callback which triggers on user input or 'ENTER' keyDown event when any control in in focus
+ * @param {function} props.onChange - callback which triggers on user input event
+ * @param {function} props.onInputEnterPress - callback which triggers on user 'ENTER' keydown event when any control in in focus
  * @param {{red, green, blue, alpha} | {cyan, magenta, yellow, black} | null} props.initialValue  - value passed to color controls
  * @param {boolean} props.hasTransparency  - enables or disables related to transparency controls
  * @param {string} props.mode  - either 'CMYK' or 'RGB'
@@ -15,6 +16,7 @@ export class ReactColorPicker extends React.PureComponent {
     /**
      * @param {{
      *      onChange: Function,
+     *      onInputEnterPress: Function,
      *      initialValue: {
      *          red: number,
      *          green: number,
@@ -31,12 +33,13 @@ export class ReactColorPicker extends React.PureComponent {
      *      mode: "CMYK" | "RGB",
      * }} props
      */
-    constructor({ onChange, initialValue, hasTransparency, mode }) {
+    constructor({ onChange, onInputEnterPress, initialValue, hasTransparency, mode }) {
         super();
 
         let rgb, hsv, cmyk, hex;
 
         this.onChange = onChange;
+        this.onInputEnterPress = onInputEnterPress;
         this.initialValue = initialValue;
         this.hasTransparency = hasTransparency;
         this.mode = mode;
@@ -473,6 +476,8 @@ export class ReactColorPicker extends React.PureComponent {
             ...rgb,
             hex,
         });
+
+        this.paletteCanvasRef.current.focus();
     }, 10)
 
     /**
@@ -697,11 +702,21 @@ export class ReactColorPicker extends React.PureComponent {
 
     /**
      *
+     * @param {React.KeyboardEvent<HTMLInputElement>} event
+     */
+    onEnterKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            this.onInputEnterPress(this.state);
+        };
+    }
+
+    /**
+     *
      * @returns {JSX.Element}
      */
     render() {
         return (
-            <div className="react-color-picker__container">
+            <div className="react-color-picker__container" onKeyDown={this.onEnterKeyDown}>
                 <div className="react-color-picker__palette">
                     <canvas
                         width="240"

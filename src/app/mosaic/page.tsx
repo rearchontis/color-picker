@@ -6,6 +6,7 @@ export default function Page() {
         <>
             <ReactColorPicker
                 onChange={() => {}}
+                onInputEnterPress={() => {}}
                 initialValue={{red: 255, green: 0, blue: 0, alpha: 75}}
                 hasTransparency={true}
                 mode="CMYK"
