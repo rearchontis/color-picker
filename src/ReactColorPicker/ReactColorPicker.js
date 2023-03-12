@@ -106,7 +106,7 @@ export class ReactColorPicker extends React.Component {
 
     componentDidUpdate() {
         let CSSColor, CSSPreviewColor, rgb;
-
+        console.log("componentDidUpdate", this.state.alpha)
         if (this.isRGBStateValid()) {
             rgb = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
             this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 1)`);
@@ -583,7 +583,7 @@ export class ReactColorPicker extends React.Component {
         }
 
         if (target.value === '') {
-            this.setState({ ...this.state, [target.name]: target.value });
+            this.setState({ ...this.state, alpha: 0 });
         }
     }
 
