@@ -11,7 +11,7 @@ import {Input} from './Input/Input'
  * @param {boolean} props.hasTransparency  - enables or disables related to transparency controls
  * @param {string} props.mode  - either 'CMYK' or 'RGB'
  */
-export class ReactColorPicker extends React.PureComponent {
+export class ReactColorPicker extends React.Component {
 
     /**
      * @param {{
@@ -102,31 +102,31 @@ export class ReactColorPicker extends React.PureComponent {
             CSSPreviewColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
             this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
         }
-
-
     }
 
     componentDidUpdate() {
         let CSSColor, CSSPreviewColor, rgb;
 
-        rgb = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
-        this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 1)`);
+        if (this.isRGBStateValid()) {
+            rgb = ReactColorPicker.hsl2rgb({ hue: this.state.hue, saturation: 100, lightness: 50 });
+            this.rainbowSliderRef.current.style.setProperty('--current-color', `rgba(${rgb.red}, ${rgb.green}, ${rgb.blue}, 1)`);
 
-        CSSColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
-        this.paletteMarkerRef.current.style.setProperty('--current-color', CSSColor);
+            CSSColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
+            this.paletteMarkerRef.current.style.setProperty('--current-color', CSSColor);
 
-        if (this.hasTransparency) {
-            CSSPreviewColor = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
+            if (this.hasTransparency) {
+                CSSPreviewColor = `rgba(${this.state.red}, ${this.state.green}, ${this.state.blue}, ${this.state.alpha / 100})`;
 
-            this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
-            this.alphaChannelSliderRef.current.style.setProperty('--current-color', CSSPreviewColor);
-            this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSColor);
-        } else {
-            CSSPreviewColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
-            this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
+                this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
+                this.alphaChannelSliderRef.current.style.setProperty('--current-color', CSSPreviewColor);
+                this.alphaChannelSliderGradientRef.current.style.setProperty('--current-color', CSSColor);
+            } else {
+                CSSPreviewColor = `rgb(${this.state.red}, ${this.state.green}, ${this.state.blue})`;
+                this.previewRef.current.style.setProperty('--current-color', CSSPreviewColor);
+            }
+
+            this.onChange(this.state);
         }
-
-        this.onChange(this.state);
     }
 
     /**
@@ -135,6 +135,18 @@ export class ReactColorPicker extends React.PureComponent {
     componentWillUnmount() {
         document.removeEventListener('mouseup', this.onPalatteMouseUp);
         document.removeEventListener('mousemove', this.onPaletteMouseMove);
+    }
+
+    isRGBStateValid = () => {
+        let red, green, blue, numbersRegExp, maxRGBValue;
+
+        red = this.state.red;
+        green = this.state.green;
+        blue = this.state.red;
+        numbersRegExp = /^[0-9]+$/;
+        maxRGBValue = 255;
+
+        return [red, green, blue].every((value) => numbersRegExp.test(value) && value <= maxRGBValue);
     }
 
     /**
@@ -315,7 +327,7 @@ export class ReactColorPicker extends React.PureComponent {
     /**
      *
      * @param {string} hex
-     * @description valid input: fff, ffffff, ffffff64, #fff, #ffffff, #ffffff64
+     * @description valid input: afe, aaffee, aaffee64, #afe, #aaffee, #aaffee
      * @returns {{
      *      red: number,
      *      green: number,
@@ -544,13 +556,13 @@ export class ReactColorPicker extends React.PureComponent {
     onAlphaChannelInputChange = ({ target }) => {
         let red, green, blue, numbersRegExp, maxValue, alpha, hex;
 
-        red = this.state.red;
-        green = this.state.green;
-        blue = this.state.blue;
+        red = this.state.red | 0;
+        green = this.state.green | 0;
+        blue = this.state.blue | 0;
         numbersRegExp = /^[0-9]+$/;
         maxValue = 100;
 
-        if (numbersRegExp.test(target.value) || target.value === '') {
+        if (numbersRegExp.test(target.value)) {
             alpha = Number(target.value);
 
             if (alpha > maxValue) {
@@ -565,6 +577,10 @@ export class ReactColorPicker extends React.PureComponent {
 
             this.setState({ ...this.state, hex, alpha });
         }
+
+        if (target.value === '') {
+            this.setState({ ...this.state, [target.name]: target.value });
+        }
     }
 
     /**
@@ -572,15 +588,15 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
-        let hex, fullHexFormatRegExp, hexAlpha, transparencyValue, transparencyLimitInHex, transparencyLimitInDecimal;
+        let hex, fullHexFormatRegExp, rgb, hsv, cmyk;
 
         hex = target.value;
         fullHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
 
         if (fullHexFormatRegExp.test(hex)) {
-            let rgb = ReactColorPicker.hex2rgb(hex);
-            let hsv = ReactColorPicker.rgb2hsv(rgb);
-            let cmyk = ReactColorPicker.rgb2cmyk(rgb);
+            rgb = ReactColorPicker.hex2rgb(hex);
+            hsv = ReactColorPicker.rgb2hsv(rgb);
+            cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
             this.updatePalette(hsv.hue);
             this.updatePaletteMarkerPosition(hsv.saturation, hsv.value);
@@ -602,26 +618,26 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onRgbInputChange = ({ target }) => {
-        let numbersRegExp = /^[0-9]+$/;
-        let maxValue = 255;
+        let numbersRegExp, maxValue, targetValue, rgb, cmyk, hsv, hex;
 
-        if (numbersRegExp.test(target.value) || target.value === '') {
-            let targetValue = Number(target.value);
+        numbersRegExp = /^[0-9]+$/;
+        maxValue = 255;
+
+        if (numbersRegExp.test(target.value)) {
+            targetValue = Number(target.value);
 
             if (targetValue > maxValue) {
                 targetValue = maxValue;
             }
 
-            let rgb = {
-                red: this.state.red,
-                green: this.state.green,
-                blue: this.state.blue,
-                [target.name]: targetValue,
+            rgb = {
+                red: this.state.red | 0,
+                green: this.state.green | 0,
+                blue: this.state.blue | 0,
+                [target.name]: targetValue | 0,
             };
-            let cmyk = ReactColorPicker.rgb2cmyk(rgb);
-            let hsv = ReactColorPicker.rgb2hsv(rgb);
-
-            let hex;
+            cmyk = ReactColorPicker.rgb2cmyk(rgb);
+            hsv = ReactColorPicker.rgb2hsv(rgb);
 
             if (this.hasTransparency) {
                 hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
@@ -641,6 +657,9 @@ export class ReactColorPicker extends React.PureComponent {
             });
         }
 
+        if (target.value === '') {
+            this.setState({ ...this.state, [target.name]: target.value });
+        }
     }
 
     /**
@@ -648,28 +667,27 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onCmykInputChange = ({ target }) => {
-        let numbersRegExp = /^[0-9]+$/;
+        let numbersRegExp, maxValue, targetValue, cmyk, rgb, hsv, hex;
 
-        let maxValue = 100;
+        numbersRegExp = /^[0-9]+$/;
+        maxValue = 100;
 
-        if (numbersRegExp.test(target.value) || target.value === '') {
-            let targetValue = Number(target.value);
+        if (numbersRegExp.test(target.value)) {
+            targetValue = Number(target.value);
 
             if (targetValue > maxValue) {
                 targetValue = maxValue;
             }
 
-            let cmyk = {
-                cyan: this.state.cyan,
-                magenta: this.state.magenta,
-                yellow: this.state.yellow,
-                black: this.state.black,
-                [target.name]: targetValue,
+            cmyk = {
+                cyan: this.state.cyan | 0,
+                magenta: this.state.magenta | 0,
+                yellow: this.state.yellow | 0,
+                black: this.state.black | 0,
+                [target.name]: targetValue | 0,
             };
-            let rgb = ReactColorPicker.cmyk2rgb(cmyk);
-            let hsv = ReactColorPicker.rgb2hsv(rgb);
-
-            let hex = '';
+            rgb = ReactColorPicker.cmyk2rgb(cmyk);
+            hsv = ReactColorPicker.rgb2hsv(rgb);
 
             if (this.hasTransparency) {
                 hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
@@ -688,14 +706,18 @@ export class ReactColorPicker extends React.PureComponent {
                 hex,
             });
         }
+
+        if (target.value === '') {
+            this.setState({ ...this.state, [target.name]: target.value });
+        }
     }
 
     /**
      *
      * @param {React.KeyboardEvent<HTMLInputElement>} event
      */
-    onEnterKeyDown = (event) => {
-        if (event.key === 'Enter') {
+    onEnterKeyDown = ({ key }) => {
+        if (key === 'Enter') {
             this.onInputEnterPress(this.state);
         };
     }
