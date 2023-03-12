@@ -56,7 +56,7 @@ export class ReactColorPicker extends React.Component {
         hsv = ReactColorPicker.rgb2hsv(rgb);
 
         if (hasTransparency) {
-            rgb.alpha = initialValue.alpha && 100;
+            rgb.alpha = initialValue.alpha || 100;
 
             this.alphaChannelSliderRef = React.createRef();
             this.alphaChannelSliderGradientRef = React.createRef();
