@@ -305,7 +305,7 @@ export class ReactColorPicker extends React.PureComponent {
     static rgb2hex = (rgb) => {
         let pad = (n) => n.toString(16).padStart(2, '0');
 
-        if (rgb.alpha) {
+        if (rgb.alpha && rgb.alpha !== 100) {
             return  `#${pad(rgb.red)}${pad(rgb.green)}${pad(rgb.blue)}${pad(rgb.alpha)}`
         }
 
@@ -315,6 +315,7 @@ export class ReactColorPicker extends React.PureComponent {
     /**
      *
      * @param {string} hex
+     * @description valid input: fff, ffffff, ffffff64, #fff, #ffffff, #ffffff64
      * @returns {{
      *      red: number,
      *      green: number,
@@ -323,30 +324,35 @@ export class ReactColorPicker extends React.PureComponent {
      * }}
      */
     static hex2rgb = (hex) => {
-        let halfHexFormatRegExp = /([0-9A-F])([0-9A-F])([0-9A-F])/i;
-        let longHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
+        let halfHexFormatRegExp, rhex, ghex, bhex, ahex, rgb;
 
-        if (longHexFormatRegExp.test(hex)) {
-            if (hex[0] === '#') {
-                hex = hex.slice(1, hex.length);
-            }
+        halfHexFormatRegExp = /([0-9A-F])([0-9A-F])([0-9A-F])/i;
 
-            if (hex.length === 3) {
-                hex = hex.replace(halfHexFormatRegExp, '$1$1$2$2$3$3');
-            }
-
-            let rhex = hex.slice(0, 2);
-            let ghex = hex.slice(2, 4);
-            let bhex = hex.slice(4, 6);
-            let ahex = hex.slice(6, 8);
-
-            return {
-                red: parseInt(rhex, 16) | 0,
-                green: parseInt(ghex, 16) | 0,
-                blue: parseInt(bhex, 16) | 0,
-                alpha: parseInt(ahex, 16) | 0,
-            };
+        if (hex[0] === '#') {
+            hex = hex.slice(1, hex.length);
         }
+
+        if (hex.length === 3) {
+            hex = hex.replace(halfHexFormatRegExp, '$1$1$2$2$3$3');
+        }
+
+        rhex = hex.slice(0, 2);
+        ghex = hex.slice(2, 4);
+        bhex = hex.slice(4, 6);
+
+        rgb = {
+            red: parseInt(rhex, 16) | 0,
+            green: parseInt(ghex, 16) | 0,
+            blue: parseInt(bhex, 16) | 0,
+        }
+
+        if (this.hasTransparency && hex.length === 8) {
+            ahex = hex.slice(6, 8);
+
+            rgb.alpha = parseInt(ahex, 16) | 0;
+        }
+
+        return rgb;
     }
 
     /**
@@ -465,7 +471,7 @@ export class ReactColorPicker extends React.PureComponent {
         let hex = '';
 
         if (this.hasTransparency) {
-            hex = ReactColorPicker.rgb2hex(rgb);
+            hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
         } else {
             hex = ReactColorPicker.rgb2hex(rgb);
         }
@@ -476,8 +482,6 @@ export class ReactColorPicker extends React.PureComponent {
             ...rgb,
             hex,
         });
-
-        this.paletteCanvasRef.current.focus();
     }, 10)
 
     /**
@@ -494,7 +498,7 @@ export class ReactColorPicker extends React.PureComponent {
         cmyk = ReactColorPicker.rgb2cmyk(rgb);
 
         if (this.hasTransparency) {
-            hex = ReactColorPicker.rgb2hex(rgb);
+            hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
         } else {
             hex = ReactColorPicker.rgb2hex(rgb);
         }
@@ -568,26 +572,12 @@ export class ReactColorPicker extends React.PureComponent {
      * @param {React.ChangeEvent<HTMLInputElement>} event
      */
     onHexInputChange = ({ target }) => {
-        let hex, halfHexFormatRegExp, fullHexFormatRegExp, hexAlpha, transparencyValue, transparencyLimitInHex, transparencyLimitInDecimal;
+        let hex, fullHexFormatRegExp, hexAlpha, transparencyValue, transparencyLimitInHex, transparencyLimitInDecimal;
 
         hex = target.value;
-        halfHexFormatRegExp = /([0-9A-F])([0-9A-F])([0-9A-F])/i;
         fullHexFormatRegExp = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)|(^#{0,1}[0-9A-F]{8}$)/i;
 
         if (fullHexFormatRegExp.test(hex)) {
-            if (hex.length === 4) {
-                hexAlpha = this.state.alpha.toString(16).padStart(2, '0');
-                hex = hex.replace(halfHexFormatRegExp, '$1$1$2$2$3$3') + hexAlpha;
-            }
-
-            transparencyValue = parseInt(hex.slice(7, 9), 16);
-            transparencyLimitInHex = '64';
-            transparencyLimitInDecimal = 100;
-
-            if (hex.length === 9 && transparencyValue > transparencyLimitInDecimal) {
-                hex = `#${hex.slice(1, 7)}${transparencyLimitInHex}`;
-            }
-
             let rgb = ReactColorPicker.hex2rgb(hex);
             let hsv = ReactColorPicker.rgb2hsv(rgb);
             let cmyk = ReactColorPicker.rgb2cmyk(rgb);
@@ -603,7 +593,7 @@ export class ReactColorPicker extends React.PureComponent {
                 hex,
             });
         } else {
-            this.setState({ ...this.state, hex: target.value })
+            this.setState({ ...this.state, hex })
         }
     }
 
@@ -634,7 +624,7 @@ export class ReactColorPicker extends React.PureComponent {
             let hex;
 
             if (this.hasTransparency) {
-                hex = ReactColorPicker.rgb2hex(rgb);
+                hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
             } else {
                 hex = ReactColorPicker.rgb2hex(rgb);
             }
@@ -682,7 +672,7 @@ export class ReactColorPicker extends React.PureComponent {
             let hex = '';
 
             if (this.hasTransparency) {
-                hex = ReactColorPicker.rgb2hex(rgb);
+                hex = ReactColorPicker.rgb2hex({ ...rgb, alpha: this.state.alpha });
             } else {
                 hex = ReactColorPicker.rgb2hex(rgb);
             }
