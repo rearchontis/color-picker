@@ -6,7 +6,7 @@ import {Input} from './Input/Input'
 
 /**
  * @param {function} props.onChange - callback which triggers on user input event
- * @param {function} props.onInputEnterPress - callback which triggers on user 'ENTER' keydown event when any control in in focus
+ * @param {function} props.onInputEnterPress - callback which triggers on user 'ENTER' keydown event when any control in focus
  * @param {{red, green, blue, alpha} | {cyan, magenta, yellow, black} | null} props.initialValue  - value passed to color controls
  * @param {boolean} props.hasTransparency  - enables or disables related to transparency controls
  * @param {string} props.mode  - either 'CMYK' or 'RGB'
