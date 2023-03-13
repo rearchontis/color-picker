@@ -2,7 +2,7 @@
 import React from 'react';
 import throttle from 'lodash.throttle';
 import './styles.css';
-import {Input} from './Input/Input'
+import {Input} from './Input/Input';
 
 /**
  * @param {function} props.onChange - callback which triggers on user input event
@@ -21,14 +21,8 @@ export class ReactColorPicker extends React.Component {
      *          red: number,
      *          green: number,
      *          blue: number,
-     *          alpha: props.hasTransparency extends true ? number : undefined,
-     *      } | {
-     *          cyan: number,
-     *          magenta: number,
-     *          yellow: number,
-     *          black: number,
-     *          alpha: props.hasTransparency extends true ? number : undefined,
-     *      } | null,
+     *          alpha: props.hasTransparency extends number ? number : undefined,
+     *      },
      *      hasTransparency: boolean,
      *      mode: "CMYK" | "RGB",
      * }} props
